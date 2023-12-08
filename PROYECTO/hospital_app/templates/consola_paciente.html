@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='consola_paciente.css') }}">
+    <title>Consola del Paciente</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Consola del Paciente</h1>
+
+        <!-- Menú de opciones -->
+        <div id="menu">
+            <ul>
+                <li><a href="{{ url_for('agendar_cita') }}">Agendar Cita</a></li>
+                <li><a href="/modificar_datos">Modificar Datos</a></li>
+            </ul>
+        </div>
+
+        <!-- Contenido dinámico se cargará aquí -->
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recepcion</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='paciente.css') }}">
+    
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flash-messages flash-success">
+            {% for message in messages %}
+                <li>{{message}}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+<div class="container">
+    <h1>Área de Recepcion</h1>
+
+    <!-- Formulario de Inicio de Sesión -->
+    <div id="login-form">
+        <h2>Iniciar Sesión</h2>
+        <form action="/paciente_post" method="post">
+            <div class="form-group">
+                <label for="id_paciente">ID Recepcion:</label>
+                <input type="text" id="id_paciente" name="id_paciente" required>
+            </div>
+
+            <div class="form-group">
+                <label for="contrasena">Contraseña:</label>
+                <input type="password" id="contrasena" name="contrasena" required>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Iniciar Sesión">
+            </div>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

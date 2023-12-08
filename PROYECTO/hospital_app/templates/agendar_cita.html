@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='/agendar_cita.css') }}">
+    <title>Consola del Paciente</title>
+</head>
+<body>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flash-messages flash-success">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <div class="container">
+        <!-- Sección para Agendar Cita -->
+        <div id="agendar-cita">
+            <h2>Agendar Cita</h2>
+            <form action="/agendar_cita_post" method="post" action="{{ url_for('agendar_cita_post') }}">
+                <label for="fecha">Fecha:</label>
+                <input type="date" id="fecha" name="fecha" required>
+
+                <label for="hora">Hora:</label>
+                <input type="time" id="hora" name="hora" required>
+
+                <button type="submit">Agendar Cita</button>
+            </form>
+        </div>
+
+        <!-- Otras secciones de la consola pueden ir aquí -->
+
+    </div>
+
+</body>
+</html>
