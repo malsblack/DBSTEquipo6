@@ -109,17 +109,35 @@ CREATE FUNCTION GenerarID
     @Tabla varchar(50),
     @Apellido nvarchar(50)
 )
-RETURNS  varchar(50) 
+RETURNS varchar(50) 
 AS
 BEGIN
     DECLARE @Prefix nvarchar(3);
     SET @Prefix = SUBSTRING(@Tabla, 1, 3);
     
     DECLARE @ID nvarchar(50);
-    SET @ID = @Prefix + CAST((SELECT COUNT(*) + 1 FROM Tabla) AS nvarchar) + @Apellido;
+
+    SELECT @ID = 
+        @Prefix +
+        CASE 
+            WHEN @Tabla = 'Paciente' THEN  CAST((SELECT COUNT(*) + 1 FROM Paciente) AS nvarchar)
+            WHEN @Tabla = 'Medico' THEN  CAST((SELECT COUNT(*) + 1 FROM Medico) AS nvarchar)
+            WHEN @Tabla = 'Recepcion' THEN  CAST((SELECT COUNT(*) + 1 FROM Recepcion) AS nvarchar)
+        
+        END +
+        @Apellido;
 
     RETURN @ID;
 END;
+
+
+
+
+
+
+
+
+
 
 CREATE PROCEDURE InsertarDatos
     @Nombre nvarchar(50),
