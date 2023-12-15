@@ -111,7 +111,7 @@ def registro_paciente_post():
         fecha_nac = request.form['fecha_nac']
         sexo = request.form['sexo']
         contraseña = request.form['password']
-        TipoTabla="Paciente"
+        TipoTabla="Medico"
 
         try:
             # Ejecutar el procedimiento almacenado para insertar datos de paciente
