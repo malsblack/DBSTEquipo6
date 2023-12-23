@@ -1,0 +1,19 @@
+{
+        "Db":{
+                "server":"LAPTOP-3KA9U966",
+                "database":"ProyectoDBST",
+                "driver":"{ODBC Driver 17 for SQL Server}",
+                "secretkey":"ProyectoDSBT"
+                },
+        "Email":{
+                "EMAIL_HOST":"smtp.gmail.com",
+                "EMAIL_PORT":587,
+                "EMAIL_USERNAME":"equipodbst@gmail.com",
+                "EMAIL_PASSWORD":"bjukqnokxdjpkxnc "
+        }
+                
+
+
+
+
+}
