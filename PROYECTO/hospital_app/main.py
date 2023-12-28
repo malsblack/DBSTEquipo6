@@ -9,6 +9,7 @@ app.secret_key = 'ProyectoDSBT'
 connection=db_connect()
 cursor = connection.cursor()
 
+
 #---------------------------- Index ------------------------------------------------------
 @app.route('/')
 def index():
@@ -130,39 +131,102 @@ def dashboard_paciente():
 
 @app.route('/agendar_cita')
 def agendar_cita():
+    def obtener_especialidades():
+        try:
+            # Ejecutar la consulta SQL para obtener las especialidades
+            cursor.execute("SELECT ID_Especialidad, Nombre FROM Especialidad")
+            # Obtener los resultados de la consulta
+            especialidades = cursor.fetchall()
+            # Confirmar la transacción
+            connection.commit()
+
+            # Devolver la lista de especialidades
+            return especialidades
+        except pyodbc.Error as ex:
+            # Si hay un error, imprimir el mensaje y hacer rollback
+            print("Error al extraer las especialidades", ex)
+            connection.rollback()
+            # En caso de error, devolver una lista vacía
+            return []
+
+    def obtener_servicios():
+        try:
+            # Ejecutar la consulta SQL para obtener las especialidades
+            cursor.execute("SELECT ID_Servicios ,NombreServicio, Costo FROM MenuServicios")
+            # Obtener los resultados de la consulta
+            servicios = cursor.fetchall()
+            # Confirmar la transacción
+            connection.commit()
+
+            # Devolver la lista de especialidades
+            return servicios
+        except pyodbc.Error as ex:
+            # Si hay un error, imprimir el mensaje y hacer rollback
+            print("Error al extraer los servicios", ex)
+            connection.rollback()
+            # En caso de error, devolver una lista vacía
+            return []
+        
+    def obtener_doctores():
+        try:
+            # Ejecutar la consulta SQL para obtener los médicos
+            cursor.execute("SELECT ID_Medico, Nombre, Ap_Pat, Ap_Mat FROM Medico")
+            # Obtener los resultados de la consulta
+            medicos = cursor.fetchall()
+            # Confirmar la transacción
+            connection.commit()
+
+            # Devolver la lista de médicos
+            return medicos
+        except pyodbc.Error as ex:
+            # Si hay un error, imprimir el mensaje y hacer rollback
+            print("Error al extraer los médicos", ex)
+            connection.rollback()
+
+            # En caso de error, devolver una lista vacía
+            return []
+    
+    especialidades = obtener_especialidades()
+    servicios=obtener_servicios()
+    medicos = obtener_doctores()
     fecha_actual = datetime.now().date()
-    return render_template('agendar_cita.html',fecha_actual=fecha_actual)
+    return render_template('agendar_cita.html',fecha_actual=fecha_actual,especialidades=especialidades,servicios=servicios,medicos=medicos)
 
 @app.route('/agendar_cita_post', methods=['POST'])
 def agendar_cita_post():
-    fecha_actual = datetime.now().date()
     if request.method == 'POST':
         # Obtener los datos del formulario
         fecha = request.form['fecha']
         hora = request.form['hora']
-
-        # Obtener el ID del paciente desde la sesión (asegúrate de haberlo almacenado previamente)
         id_paciente = session.get('id_paciente')
-        print(id_paciente)
 
         try:
+            # Obtener datos adicionales del formulario
+            id_especialidad = request.form['especialidad']
+            id_servicio = request.form['servicio']
+            id_medico = request.form['medico']
+
+            # Obtener el precio del servicio
+            cursor.execute("SELECT Costo FROM MenuServicios WHERE ID_Servicios = ?", id_servicio)
+            costo_servicio = cursor.fetchone()[0]
+            print(f"EXEC InsertarCita {fecha} ,{hora} ,Pendiente ,{costo_servicio}, M@STEr ,{id_paciente} ,{id_medico}")
+
             # Ejecutar la consulta SQL para agregar la cita a la base de datos
             cursor.execute("EXEC InsertarCita ?, ?, ?, ?, ?, ?, ?",
-                           fecha, hora, 'Pendiente', 0, None, id_paciente, None)
+                           fecha, hora, 'Pendiente', costo_servicio, 'M@STEr', id_paciente, id_medico)
             # Confirmar la transacción
             connection.commit()
-            
+
             # Mostrar mensaje flash y redirigir
             flash("Cita agendada exitosamente.", 'success')
-            return redirect('/consola_paciente')
+            return redirect('/dashboard_paciente')
         except pyodbc.Error as ex:
             # Si hay un error, imprimir el mensaje y hacer rollback
             print("Error al agendar cita:", ex)
             connection.rollback()
 
     # Si el método no es POST o hay un error, redirigir a la consola del paciente
-    return redirect('/consola_paciente')
-
+    return redirect('/dashboard_paciente')
 
 
 

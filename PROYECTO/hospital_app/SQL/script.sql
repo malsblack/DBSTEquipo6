@@ -310,6 +310,30 @@ BEGIN
     RETURN @Resultado;
 END;
 
+CREATE FUNCTION GenerarIdCita(@FechaAtencion date, @HoraAtencion time)
+RETURNS NVARCHAR(50)
+AS
+BEGIN
+    DECLARE @idCita NVARCHAR(50);
+
+    -- Convertir la fecha a un formato específico, si es necesario
+    DECLARE @fechaString NVARCHAR(20) = CONVERT(NVARCHAR(20), @FechaAtencion, 112);
+
+    -- Formatear la hora en formato de 24 horas, si es necesario
+    DECLARE @horaString NVARCHAR(20) = CONVERT(NVARCHAR(20), @HoraAtencion, 108);
+
+    -- Eliminar los dos puntos de la hora
+    SET @horaString = REPLACE(@horaString, ':', '');
+
+    -- Obtener el número de registro (puedes ajustar esta lógica según tus necesidades)
+    DECLARE @numeroRegistro NVARCHAR(4) = RIGHT('000' + CAST((SELECT COUNT(*) + 1 FROM Cita) AS NVARCHAR(4)), 4);
+
+    -- Concatenar la fecha, la hora y el número de registro para formar el ID de la cita
+    SET @idCita = @fechaString + @horaString + @numeroRegistro;
+
+    RETURN @idCita;
+END;
+
 CREATE PROCEDURE InsertarCita
     @FechaAtencion date,
     @HoraAtencion time,
@@ -323,15 +347,21 @@ BEGIN
     -- Validar disponibilidad de la cita
     IF dbo.ValidarDisponibilidadCita(@FechaAtencion, @HoraAtencion, @ID_Medico) = 1
     BEGIN
+        DECLARE @id_cita VARCHAR(50);
+        SET @id_cita = dbo.GenerarIdCita(@FechaAtencion,@HoraAtencion);
         -- Insertar la cita si está disponible
-        INSERT INTO Cita (FechaAtencion, HoraAtencion, Estatus, Costo, ID_Recepcion, ID_Paciente, ID_Medico)
-        VALUES (@FechaAtencion, @HoraAtencion, @Estatus, @Costo, @ID_Recepcion, @ID_Paciente, @ID_Medico);
+        INSERT INTO Cita (ID_Cita,FechaAtencion, HoraAtencion, Estatus, Costo, ID_Recepcion, ID_Paciente, ID_Medico)
+        VALUES (@id_cita,@FechaAtencion, @HoraAtencion, @Estatus, @Costo, @ID_Recepcion, @ID_Paciente, @ID_Medico);
     END
     ELSE
     BEGIN
         PRINT 'Error: La cita ya está ocupada en la fecha y hora especificadas.';
     END
 END;
+
+
+
+
 
 
 CREATE FUNCTION GenerarIdEspecialidad()
