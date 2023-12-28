@@ -24,7 +24,7 @@
             <h2>Agendar Cita</h2>
             <form action="/agendar_cita_post" method="post" action="{{ url_for('agendar_cita_post') }}">
                 <label for="fecha">Fecha:</label>
-                <input type="date" id="fecha" name="fecha" required>
+                <input type="date" id="fecha" name="fecha" required min="{{ fecha_actual.strftime('%Y-%m-%d') }}">
 
                 <label for="hora">Hora:</label>
                 <input type="time" id="hora" name="hora" required>

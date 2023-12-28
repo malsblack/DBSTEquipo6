@@ -90,8 +90,8 @@ def registro_paciente_post():
             fecha_nac = datetime.strptime(fecha_nac, '%Y-%m-%d').date()
 
             # Ejecutar el procedimiento almacenado para insertar datos de paciente
-            cursor.execute("EXEC InsertarDatos ?, ?, ?, ?, ?, ?, ?, ?",
-                           nombre, ap_pat, ap_mat, contacto, fecha_nac, sexo, contraseña, TipoTabla)
+            cursor.execute("EXEC InsertarDatos ?, ?, ?, ?, ?, ?, ?, ?, ?",
+                           nombre, ap_pat, ap_mat, contacto, fecha_nac, sexo, contraseña, TipoTabla, 0)
 
             # Confirmar la transacción
             connection.commit()
@@ -130,10 +130,12 @@ def dashboard_paciente():
 
 @app.route('/agendar_cita')
 def agendar_cita():
-    return render_template('agendar_cita.html')
+    fecha_actual = datetime.now().date()
+    return render_template('agendar_cita.html',fecha_actual=fecha_actual)
 
 @app.route('/agendar_cita_post', methods=['POST'])
 def agendar_cita_post():
+    fecha_actual = datetime.now().date()
     if request.method == 'POST':
         # Obtener los datos del formulario
         fecha = request.form['fecha']

@@ -135,10 +135,7 @@ END;
 
 
 
-
-
-
-
+-- Se modifico 
 CREATE PROCEDURE InsertarDatos
     @Nombre nvarchar(50),
     @Ap_Pat nvarchar(50),
@@ -147,26 +144,29 @@ CREATE PROCEDURE InsertarDatos
     @FechaNac date,
     @Sexo char(1),
     @Contraseña nvarchar(50),
-    @TipoTabla nvarchar(50)
+    @TipoTabla nvarchar(50),
+    @id_especialidad int
 AS
 BEGIN
     DECLARE @ID nvarchar(50);
+    DECLARE @ConsultorioID int;
 
     -- Generar ID alfanumérico
     SET @ID = dbo.GenerarID(@TipoTabla, @Ap_Pat);
+    SET @ConsultorioID = (SELECT MAX(Consultorio) + 1 FROM Medico);
 
     -- Insertar en la tabla correspondiente
     IF @TipoTabla = 'Paciente'
         INSERT INTO Paciente (ID_Paciente, Nombre, Ap_Pat, Ap_Mat, Contacto, FechaNac, Sexo, Contraseña)
         VALUES (@ID, @Nombre, @Ap_Pat, @Ap_Mat, @Contacto, @FechaNac, @Sexo, @Contraseña);
     ELSE IF @TipoTabla = 'Medico'
-        INSERT INTO Medico (ID_Medico, Nombre, Ap_Pat, Ap_Mat, Contacto, Contraseña)
-        VALUES (@ID, @Nombre, @Ap_Pat, @Ap_Mat, @Contacto, @Contraseña);
+        INSERT INTO Medico (ID_Medico, Nombre, Ap_Pat, Ap_Mat, Contacto, Contraseña, Consultorio,ID_Especialidad)
+        VALUES (@ID, @Nombre, @Ap_Pat, @Ap_Mat, @Contacto, @Contraseña, @ConsultorioID,@id_especialidad);
     ELSE IF @TipoTabla = 'Recepcion'
         INSERT INTO Recepcion (ID_Recepcion, Nombre, Ap_Pat, Ap_Mat, Contacto, Contraseña)
         VALUES (@ID, @Nombre, @Ap_Pat, @Ap_Mat, @Contacto, @Contraseña);
 END;
-
+--Falta modificar
 CREATE PROCEDURE EditarDatos
     @ID nvarchar(50),
     @NuevoNombre nvarchar(50),
@@ -191,7 +191,7 @@ BEGIN
         SET Nombre = @NuevoNombre, Ap_Pat = @NuevoAp_Pat, Ap_Mat = @NuevoAp_Mat, Contacto = @NuevoContacto, Contraseña = @NuevoContraseña
         WHERE ID_Recepcion = @ID;
 END;
-
+--Falta modificar
 CREATE PROCEDURE BorrarDatos
     @ID nvarchar(50),
     @TipoTabla nvarchar(50)
@@ -205,24 +205,39 @@ BEGIN
     ELSE IF @TipoTabla = 'Recepcion'
         DELETE FROM Recepcion WHERE ID_Recepcion = @ID;
 END;
-
-CREATE PROCEDURE InsertarServicio
-    @Nombre nvarchar(50),
-    @Costo int
+--Se creo nuevo
+CREATE FUNCTION GenerarIdServicio()
+RETURNS INT
 AS
 BEGIN
+    DECLARE @id INT;
+
+    SELECT @id = ISNULL(MAX(ID_Servicios), 0) + 1
+    FROM MenuServicios;
+
+    RETURN @id;
+END;
+--Se mofico
+CREATE PROCEDURE InsertarServicio
+    @Nombre nvarchar(50),
+    @Costo int,
+    @Id_recepcion nvarchar(50)
+AS
+BEGIN
+    DECLARE @id_servicio VARCHAR(10);
+    SET @id_servicio = dbo.GenerarIdServicio();
     -- Validar si el nombre del servicio ya existe y el costo es mayor a 50
     IF NOT EXISTS (SELECT 1 FROM MenuServicios WHERE NombreServicio = @Nombre) AND @Costo > 50
     BEGIN
-        INSERT INTO MenuServicios (NombreServicio, Costo)
-        VALUES (@Nombre, @Costo);
+        INSERT INTO MenuServicios (ID_Servicios, NombreServicio, Costo, ID_Recepcion)
+        VALUES (@id_servicio, @Nombre, @Costo,@Id_recepcion);
     END
     ELSE
     BEGIN
         PRINT 'Error: Nombre de servicio duplicado o costo menor o igual a 50.';
     END
 END;
-
+--Falta modificar
 CREATE PROCEDURE ModificarServicio
     @ID_Servicio int,
     @NuevoNombre nvarchar(50),
@@ -241,7 +256,7 @@ BEGIN
         PRINT 'Error: Nuevo nombre de servicio duplicado o nuevo costo menor o igual a 50.';
     END
 END;
-
+--Falta modificar
 CREATE PROCEDURE EliminarServicio
     @ID_Servicio int
 AS
@@ -316,4 +331,28 @@ BEGIN
     BEGIN
         PRINT 'Error: La cita ya está ocupada en la fecha y hora especificadas.';
     END
+END;
+
+
+CREATE FUNCTION GenerarIdEspecialidad()
+RETURNS INT
+AS
+BEGIN
+    DECLARE @id INT;
+
+    SELECT @id = ISNULL(MAX(id_especialidad), 0) + 1
+    FROM Especialidad;
+
+    RETURN @id;
+END;
+
+CREATE PROCEDURE InsertarEspecialidad
+    @nombre VARCHAR(255)
+AS
+BEGIN
+    DECLARE @id_especialidad VARCHAR(10);
+    SET @id_especialidad = dbo.GenerarIdEspecialidad();
+
+    INSERT INTO Especialidad (ID_Especialidad, Nombre)
+    VALUES (@id_especialidad, @nombre);
 END;
