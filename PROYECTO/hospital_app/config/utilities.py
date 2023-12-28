@@ -72,7 +72,9 @@ def send_registration_email(nombre, ap_pat, ap_mat, contacto, nombre_usuario):
                 Esperamos que encuentres la información y los servicios que ofrecemos útiles para tu bienestar.
             </p>
             <p>Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarnos.</p>
-            <p>Gracias por confiar en nosotros, tu usuario es : <span class="highlight">{nombre_usuario}</span>. ¡Te deseamos salud y felicidad!</p>
+            <p>Gracias por confiar en nosotros, tu usuario es :</p>
+            <span class="highlight">{nombre_usuario}</span>. 
+            <p>¡Te deseamos salud y felicidad!</p>
         </div>
     </body>
     </html>

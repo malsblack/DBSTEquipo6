@@ -118,9 +118,8 @@ def registro_paciente_post():
 
     # Si el método no es POST o hay un error, redirigir a la página de registro del paciente
     return redirect('/registro_paciente')  
+
 @app.route('/dashboard_paciente')
-
-
 def dashboard_paciente():
     # Verificar si el paciente ha iniciado sesión
     if 'id_paciente' not in session:
@@ -129,6 +128,9 @@ def dashboard_paciente():
 
     return render_template('dashboard_paciente.html')   
 
+@app.route('/agendar_cita')
+def agendar_cita():
+    return render_template('agendar_cita.html')
 
 @app.route('/agendar_cita_post', methods=['POST'])
 def agendar_cita_post():
@@ -160,9 +162,6 @@ def agendar_cita_post():
     return redirect('/consola_paciente')
 
 
-@app.route('/agendar_cita')
-def agendar_cita():
-    return render_template('agendar_cita.html')
 
 
 
