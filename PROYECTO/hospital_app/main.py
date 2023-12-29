@@ -17,11 +17,11 @@ def index():
 
 #---------------------------- Paciente ----------------------------------------------------
 
-@app.route('/login_paciente')
+@app.route('/Paciente/login_paciente')
 def login_paciente():
-    return render_template('login_paciente.html')
+    return render_template('/Paciente/login_paciente.html')
 
-@app.route('/login_paciente_post',methods = ['POST'])
+@app.route('/Paciente/login_paciente_post',methods = ['POST'])
 def login_paciente_post():
     if request.method == 'POST':
         # Obtener los datos del formulario de inicio de sesión
@@ -38,24 +38,24 @@ def login_paciente_post():
                 session['id_paciente'] = id_paciente
 
                 # Redirigir a la página del paciente
-                return redirect('/dashboard_paciente')
+                return redirect('/Paciente/dashboard_paciente')
             else:
                 # Si las credenciales son incorrectas, mostrar un mensaje de error
                 flash("Credenciales incorrectas. Inténtalo de nuevo.", 'error')
-                return redirect('/dashboard_paciente')
+                return redirect('/Paciente/dashboard_paciente')
 
         except pyodbc.Error as ex:
             # Si hay un error, imprimir el mensaje
             print("Error al iniciar sesión del paciente:", ex)
 
     # Redirigir a la página del paciente en cualquier caso
-    return redirect('/login_paciente')
+    return redirect('/Paciente/login_paciente')
 
-@app.route('/registro_paciente')
+@app.route('/Paciente/registro_paciente')
 def registro_paciente():
-    return render_template('registro_paciente.html')
+    return render_template('/Paciente/registro_paciente.html')
 
-@app.route('/registro_paciente_post', methods=['POST'])
+@app.route('/Paciente/registro_paciente_post', methods=['POST'])
 def registro_paciente_post():
     if request.method == 'POST':
         # Obtener los datos del formulario
@@ -71,7 +71,7 @@ def registro_paciente_post():
         # Validar que el campo de contacto sea un correo electrónico válido
         if not re.match(r"[^@]+@[^@]+\.[^@]+", contacto):
             flash("Por favor, introduce un correo electrónico válido.", 'error')
-            return redirect('/registro_paciente')
+            return redirect('/Paciente/registro_paciente')
 
         # Verificar si el correo ya está registrado
         cursor.execute("SELECT ID_Paciente FROM Paciente WHERE Contacto = ?", contacto)
@@ -79,12 +79,12 @@ def registro_paciente_post():
 
         if existing_patient:
             flash("Este correo electrónico ya está registrado. Por favor, utiliza otro.", 'error')
-            return redirect('/registro_paciente')
+            return redirect('/Paciente/registro_paciente')
 
         # Validar la contraseña
         if not re.match(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", contraseña):
             flash("La contraseña debe tener al menos 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial y una longitud mínima de 8 caracteres.", 'error')
-            return redirect('/registro_paciente')
+            return redirect('/Paciente/registro_paciente')
 
         try:
             # Convertir la fecha a un formato adecuado para tu base de datos
@@ -109,7 +109,7 @@ def registro_paciente_post():
 
             # Mostrar mensaje flash y redirigir
             flash(f"Registro de paciente exitoso. ID: {id_paciente}", 'success')
-            return redirect('/login_paciente')
+            return redirect('/Paciente/login_paciente')
 
         except pyodbc.Error as ex:
             # Si hay un error, imprimir el mensaje y hacer rollback
@@ -118,18 +118,18 @@ def registro_paciente_post():
             connection.rollback()
 
     # Si el método no es POST o hay un error, redirigir a la página de registro del paciente
-    return redirect('/registro_paciente')  
+    return redirect('/Paciente/registro_paciente')  
 
-@app.route('/dashboard_paciente')
+@app.route('/Paciente/dashboard_paciente')
 def dashboard_paciente():
     # Verificar si el paciente ha iniciado sesión
     if 'id_paciente' not in session:
         flash("Debes iniciar sesión para acceder a la consola del paciente.", 'error')
-        return redirect('/login_paciente')
+        return redirect('/Paciente/login_paciente')
 
-    return render_template('dashboard_paciente.html')   
+    return render_template('/Paciente/dashboard_paciente.html')   
 
-@app.route('/agendar_cita')
+@app.route('/Paciente/agendar_cita')
 def agendar_cita():
     def obtener_especialidades():
         try:
@@ -190,9 +190,9 @@ def agendar_cita():
     servicios=obtener_servicios()
     medicos = obtener_doctores()
     fecha_actual = datetime.now().date()
-    return render_template('agendar_cita.html',fecha_actual=fecha_actual,especialidades=especialidades,servicios=servicios,medicos=medicos)
+    return render_template('/Paciente/agendar_cita.html',fecha_actual=fecha_actual,especialidades=especialidades,servicios=servicios,medicos=medicos)
 
-@app.route('/agendar_cita_post', methods=['POST'])
+@app.route('/Paciente/agendar_cita_post', methods=['POST'])
 def agendar_cita_post():
     if request.method == 'POST':
         # Obtener los datos del formulario
@@ -219,19 +219,88 @@ def agendar_cita_post():
 
             # Mostrar mensaje flash y redirigir
             flash("Cita agendada exitosamente.", 'success')
-            return redirect('/dashboard_paciente')
+            return redirect('/Paciente/dashboard_paciente')
         except pyodbc.Error as ex:
             # Si hay un error, imprimir el mensaje y hacer rollback
             print("Error al agendar cita:", ex)
             connection.rollback()
 
     # Si el método no es POST o hay un error, redirigir a la consola del paciente
-    return redirect('/dashboard_paciente')
+    return redirect('/Paciente/dashboard_paciente')
+
+@app.route('/Paciente/modificar_paciente')
+def modificar_paciente():
+    # Obtener el ID del paciente desde la sesión (asegúrate de haberlo almacenado previamente)
+    id_paciente = session.get('id_paciente')
+
+    # Consultar la información del paciente desde la base de datos
+    cursor.execute("SELECT ID_Paciente, Nombre, Ap_Pat, Ap_Mat, Contacto, FechaNac, Sexo FROM Paciente WHERE ID_Paciente = ?", id_paciente)
+    paciente_info = cursor.fetchone()
+
+    fecha_nacimiento_formateada = paciente_info[5].strftime('%Y-%m-%d')
+
+
+    return render_template('/Paciente/modificar_paciente.html', paciente_info=paciente_info, fecha_nacimiento_formateada=fecha_nacimiento_formateada)
 
 
 
+@app.route('/Paciente/modificar_paciente_post', methods=['POST'])
+def modificar_paciente_post():
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        nombre = request.form['nombre']
+        ap_pat = request.form['ap_pat']
+        ap_mat = request.form['ap_mat']
+        contacto = request.form['contacto']
+        fecha_nac = request.form['fecha_nac']
+        sexo = request.form['sexo']
+        contraseña = request.form['password']
 
-       
+        # Validar que el campo de contacto sea un correo electrónico válido
+
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", contacto):
+            flash("Por favor, introduce un correo electrónico válido.", 'error')
+            return redirect('/Paciente/modificar_paciente')
+        
+        # Verificar si el correo ya está registrado
+        cursor.execute("SELECT ID_Paciente FROM Paciente WHERE Contacto = ?", contacto)
+        existing_patient = cursor.fetchone()
+
+        if existing_patient:
+            flash("Este correo electrónico ya está registrado. Por favor, utiliza otro.", 'error')
+            return redirect('/Paciente/registro_paciente')
+
+        # Validar la contraseña
+        if not re.match(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", contraseña):
+            flash("La contraseña debe tener al menos 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial y una longitud mínima de 8 caracteres.", 'error')
+            return redirect('/Paciente/modificar_paciente')
+
+        try:
+            # Convertir la fecha a un formato adecuado para tu base de datos
+            fecha_nac = datetime.strptime(fecha_nac, '%Y-%m-%d').date()
+
+            # Obtener el ID del paciente desde la sesión (asegúrate de haberlo almacenado previamente)
+            id_paciente = session.get('id_paciente')
+
+            # Ejecutar la consulta SQL para actualizar los datos del paciente
+            cursor.execute("UPDATE Paciente SET Nombre = ?, Ap_Pat = ?, Ap_Mat = ?, Contacto = ?, "
+                           "FechaNac = ?, Sexo = ?, Contraseña = ? WHERE ID_Paciente = ?",
+                           nombre, ap_pat, ap_mat, contacto, fecha_nac, sexo, contraseña, id_paciente)
+
+            # Confirmar la transacción
+            connection.commit()
+
+            # Mostrar mensaje flash y redirigir
+            flash("Datos de paciente actualizados exitosamente.", 'success')
+            return redirect('/Paciente/dashboard_paciente')
+        except pyodbc.Error as ex:
+            # Si hay un error, imprimir el mensaje y hacer rollback
+            print("Error al actualizar datos del paciente:", ex)
+            flash("Error al actualizar datos del paciente. Inténtalo de nuevo.", 'error')
+            connection.rollback()
+
+    # Si el método no es POST o hay un error, redirigir a la consola del paciente
+    return redirect('/Paciente/dashboard_paciente')
             
 #---------------------------- Medico ----------------------------------------------------
 #---------------------------- Farmacia ----------------------------------------------------
