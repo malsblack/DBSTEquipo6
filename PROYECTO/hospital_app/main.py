@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request , redirect , flash, session
+from flask import Flask, render_template, request , redirect , flash, session , jsonify
 import pyodbc
 from datetime import datetime
 import re
@@ -15,6 +15,13 @@ cursor = connection.cursor()
 def index():
     return render_template('index.html')
 
+@app.route('/logout')
+def logout():
+    # Limpiar la sesión
+    session.clear()
+    flash("Has cerrado sesión exitosamente.", 'success')
+    # Redirigir al usuario a la página de inicio de sesión o al inicio
+    return redirect('/')
 #---------------------------- Paciente ----------------------------------------------------
 
 @app.route('/Paciente/login_paciente')
@@ -30,7 +37,7 @@ def login_paciente_post():
 
         try:
             # Verificar las credenciales en la base de datos
-            cursor.execute("SELECT ID_Paciente FROM Paciente WHERE ID_Paciente = ? AND Contraseña = ?", id_paciente, contraseña)
+            cursor.execute("SELECT ID_Paciente FROM Paciente WHERE ID_Paciente = ? AND Contrasena = ?", id_paciente, contraseña)
             result = cursor.fetchone()
 
             if result:
@@ -42,7 +49,7 @@ def login_paciente_post():
             else:
                 # Si las credenciales son incorrectas, mostrar un mensaje de error
                 flash("Credenciales incorrectas. Inténtalo de nuevo.", 'error')
-                return redirect('/Paciente/dashboard_paciente')
+                return redirect('/Paciente/login_paciente')
 
         except pyodbc.Error as ex:
             # Si hay un error, imprimir el mensaje
@@ -66,7 +73,6 @@ def registro_paciente_post():
         fecha_nac = request.form['fecha_nac']
         sexo = request.form['sexo']
         contraseña = request.form['password']
-        TipoTabla = "Paciente"
 
         # Validar que el campo de contacto sea un correo electrónico válido
         if not re.match(r"[^@]+@[^@]+\.[^@]+", contacto):
@@ -91,15 +97,15 @@ def registro_paciente_post():
             fecha_nac = datetime.strptime(fecha_nac, '%Y-%m-%d').date()
 
             # Ejecutar el procedimiento almacenado para insertar datos de paciente
-            cursor.execute("EXEC InsertarDatos ?, ?, ?, ?, ?, ?, ?, ?, ?",
-                           nombre, ap_pat, ap_mat, contacto, fecha_nac, sexo, contraseña, TipoTabla, 0)
+            cursor.execute("EXEC SP_AgregarPaciente ?, ?, ?, ?, ?, ?, ?",
+                           nombre, ap_pat, ap_mat, contacto, fecha_nac, sexo, contraseña)
 
             # Confirmar la transacción
             connection.commit()
 
             # Obtener el ID del nuevo usuario
-            cursor.execute("SELECT ID_Paciente FROM Paciente WHERE Nombre = ? AND Ap_Pat = ? AND Ap_Mat = ?",
-                           nombre, ap_pat, ap_mat)
+            cursor.execute("SELECT ID_Paciente FROM Paciente WHERE Contacto = ? ",
+                           contacto)
             id_paciente = cursor.fetchone()[0]
 
             # Almacenar el ID en la variable de sesión
@@ -131,6 +137,11 @@ def dashboard_paciente():
 
 @app.route('/Paciente/agendar_cita')
 def agendar_cita():
+
+    if 'id_paciente' not in session:
+        flash("Debes iniciar sesión para acceder a la consola del paciente.", 'error')
+        return redirect('/Paciente/login_paciente')
+    
     def obtener_especialidades():
         try:
             # Ejecutar la consulta SQL para obtener las especialidades
@@ -152,7 +163,7 @@ def agendar_cita():
     def obtener_servicios():
         try:
             # Ejecutar la consulta SQL para obtener las especialidades
-            cursor.execute("SELECT ID_Servicios ,NombreServicio, Costo FROM MenuServicios")
+            cursor.execute("SELECT ID_Servicios ,Nombre, Costo FROM Consultas_Servicios")
             # Obtener los resultados de la consulta
             servicios = cursor.fetchall()
             # Confirmar la transacción
@@ -170,7 +181,7 @@ def agendar_cita():
     def obtener_doctores():
         try:
             # Ejecutar la consulta SQL para obtener los médicos
-            cursor.execute("SELECT ID_Medico, Nombre, Ap_Pat, Ap_Mat FROM Medico")
+            cursor.execute("SELECT ID_Doctor, Nombre, Ap_Pat, Ap_Mat FROM Doctor")
             # Obtener los resultados de la consulta
             medicos = cursor.fetchall()
             # Confirmar la transacción
@@ -194,28 +205,44 @@ def agendar_cita():
 
 @app.route('/Paciente/agendar_cita_post', methods=['POST'])
 def agendar_cita_post():
+    if 'id_paciente' not in session:
+        flash("Debes iniciar sesión para acceder a la consola del paciente.", 'error')
+        return redirect('/Paciente/login_paciente')
+    
     if request.method == 'POST':
         # Obtener los datos del formulario
-        fecha = request.form['fecha']
-        hora = request.form['hora']
-        id_paciente = session.get('id_paciente')
+
+
 
         try:
-            # Obtener datos adicionales del formulario
-            id_especialidad = request.form['especialidad']
-            id_servicio = request.form['servicio']
+            id_paciente = session.get('id_paciente')
+            print(id_paciente)
             id_medico = request.form['medico']
+            print(id_medico)
+            fecha = request.form['fecha']
+            print(fecha)
+            hora = request.form['hora']
+            print(hora)
+            servicio=request.form['servicio']
+
+            cursor.execute(f"Select Nombre from Consultas_Servicios Where ID_Servicios = '{servicio}'")
+            desc_servicio = cursor.fetchone()[0]
+            connection.commit()
+            print(desc_servicio)
+
+            cursor.execute(f"Select Costo from Consultas_Servicios Where ID_Servicios = '{servicio}'")
+            costo = cursor.fetchone()[0]
+            connection.commit()
+            print(costo)
+            
+
+
 
             # Obtener el precio del servicio
-            cursor.execute("SELECT Costo FROM MenuServicios WHERE ID_Servicios = ?", id_servicio)
-            costo_servicio = cursor.fetchone()[0]
-            print(f"EXEC InsertarCita {fecha} ,{hora} ,Pendiente ,{costo_servicio}, M@STEr ,{id_paciente} ,{id_medico}")
-
-            # Ejecutar la consulta SQL para agregar la cita a la base de datos
-            cursor.execute("EXEC InsertarCita ?, ?, ?, ?, ?, ?, ?",
-                           fecha, hora, 'Pendiente', costo_servicio, 'M@STEr', id_paciente, id_medico)
-            # Confirmar la transacción
+            sp_query = "EXEC SP_AgregarCita ?, ?, ?, ?, ?, ?, ?, ?"
+            cursor.execute(sp_query, id_paciente, id_medico, 'ADMIN20230', fecha, hora, 'S', costo, desc_servicio)
             connection.commit()
+            print("pase")
 
             # Mostrar mensaje flash y redirigir
             flash("Cita agendada exitosamente.", 'success')
@@ -228,8 +255,89 @@ def agendar_cita_post():
     # Si el método no es POST o hay un error, redirigir a la consola del paciente
     return redirect('/Paciente/dashboard_paciente')
 
+@app.route('/cargar_servicios_doctores/<int:id_especialidad>')
+def cargar_servicios_doctores(id_especialidad):
+    servicios = obtener_servicios_por_especialidad(id_especialidad)
+    doctores = obtener_doctores_por_especialidad(id_especialidad)
+    return jsonify({'servicios': servicios, 'doctores': doctores})
+
+def obtener_servicios_por_especialidad(id_especialidad):
+    cursor.execute("SELECT * FROM Consultas_Servicios WHERE ID_Especialidad = ?", id_especialidad)
+    servicios = cursor.fetchall()
+    return [dict(ID_Servicios=servicio[0], Nombre=servicio[2], precio=servicio[3]) for servicio in servicios]
+
+def obtener_doctores_por_especialidad(id_especialidad):
+    cursor.execute("SELECT * FROM Doctor WHERE ID_Especialidad = ?", id_especialidad)
+    doctores = cursor.fetchall()
+    return [dict(ID_Doctor=doctor[0], Nombre=doctor[1], Ap_Pat=doctor[2], Ap_Mat=doctor[3]) for doctor in doctores]
+
+@app.route('/Paciente/citas_paciente')
+def citas_paciente():
+    if 'id_paciente' not in session:
+        print("si entre")
+        flash("Debes iniciar sesión para acceder a la consola del paciente.", 'error')
+        return redirect('/Paciente/login_paciente')
+    id_paciente = session.get('id_paciente')
+    cursor.execute("SELECT * from Cita Where ID_Paciente= ?", id_paciente)
+    citas = cursor.fetchall()
+
+    return render_template('/Paciente/citas_paciente.html',citas=citas)  
+
+@app.route('/modificar_cita/<id_cita>')
+def modificar_cita(id_cita):
+
+    cursor.execute("SELECT * FROM Cita WHERE ID_Cita = ?", id_cita)
+    detalles_cita = cursor.fetchone()
+    fecha_actual = datetime.now().date()
+    print(detalles_cita)
+
+    # Pasa estos detalles a la plantilla
+    return render_template('/Paciente/modificar_cita.html', cita=detalles_cita,fecha_actual=fecha_actual)
+
+
+@app.route('/modificar_cita_post/<id_cita>', methods=['POST'])
+def modificar_cita_post(id_cita):
+    # Obtén los datos del formulario
+    especialidad = request.form.get('especialidad')
+    servicio = request.form.get('servicio')
+    medico = request.form.get('medico')
+    fecha = request.form.get('fecha')
+    hora = request.form.get('hora')
+    # Asegúrate de validar estos datos antes de usarlos
+
+    try:
+        # Aquí asumo que tienes una conexión a la base de datos establecida como 'cursor'
+        # Actualiza la cita en la base de datos
+        #update_query = """
+         #   UPDATE Cita 
+          #  SET id_especialidad = ?, id_servicio = ?, id_medico = ?, fecha = ?, hora = ? 
+           # WHERE ID_Cita = ?
+        #"""
+        #cursor.execute(update_query, (especialidad, servicio, medico, fecha, hora, id_cita))
+        #cursor.commit()
+
+        flash('Cita modificada con éxito', 'success')
+    except Exception as e:
+        # Manejar la excepción
+        flash('Ocurrió un error al modificar la cita', 'error')
+        print(e)  # Para depuración
+
+    return redirect('/Paciente/citas_paciente')
+
+
+
+
+
+
+
+
+
 @app.route('/Paciente/modificar_paciente')
 def modificar_paciente():
+
+    if 'id_paciente' not in session:
+        flash("Debes iniciar sesión para acceder a la consola del paciente.", 'error')
+        return redirect('/Paciente/login_paciente')
     # Obtener el ID del paciente desde la sesión (asegúrate de haberlo almacenado previamente)
     id_paciente = session.get('id_paciente')
 
@@ -242,10 +350,15 @@ def modificar_paciente():
 
     return render_template('/Paciente/modificar_paciente.html', paciente_info=paciente_info, fecha_nacimiento_formateada=fecha_nacimiento_formateada)
 
-
-
 @app.route('/Paciente/modificar_paciente_post', methods=['POST'])
 def modificar_paciente_post():
+    if 'id_paciente' not in session:
+        flash("Debes iniciar sesión para acceder a la consola del paciente.", 'error')
+        return redirect('/Paciente/login_paciente')
+    
+    # Obtener el ID del paciente desde la sesión (asegúrate de haberlo almacenado previamente)
+    id_paciente = session.get('id_paciente')
+
     if request.method == 'POST':
         # Obtener los datos del formulario
         nombre = request.form['nombre']
@@ -263,12 +376,18 @@ def modificar_paciente_post():
             return redirect('/Paciente/modificar_paciente')
         
         # Verificar si el correo ya está registrado
-        cursor.execute("SELECT ID_Paciente FROM Paciente WHERE Contacto = ?", contacto)
+        cursor.execute("SELECT Contacto FROM Paciente WHERE ID_Paciente = ?", id_paciente)
+
         existing_patient = cursor.fetchone()
 
-        if existing_patient:
-            flash("Este correo electrónico ya está registrado. Por favor, utiliza otro.", 'error')
-            return redirect('/Paciente/registro_paciente')
+        if existing_patient[0]==contacto:
+            pass
+        else:
+            cursor.execute("SELECT ID_Paciente FROM Paciente WHERE Contacto = ?", contacto)
+            existing_patient_contact = cursor.fetchone()
+            if existing_patient_contact:
+                flash("Este correo electrónico ya está registrado. Por favor, utiliza otro.", 'error')
+                return redirect('/Paciente/modificar_paciente')
 
         # Validar la contraseña
         if not re.match(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", contraseña):
@@ -279,12 +398,9 @@ def modificar_paciente_post():
             # Convertir la fecha a un formato adecuado para tu base de datos
             fecha_nac = datetime.strptime(fecha_nac, '%Y-%m-%d').date()
 
-            # Obtener el ID del paciente desde la sesión (asegúrate de haberlo almacenado previamente)
-            id_paciente = session.get('id_paciente')
-
             # Ejecutar la consulta SQL para actualizar los datos del paciente
             cursor.execute("UPDATE Paciente SET Nombre = ?, Ap_Pat = ?, Ap_Mat = ?, Contacto = ?, "
-                           "FechaNac = ?, Sexo = ?, Contraseña = ? WHERE ID_Paciente = ?",
+                           "FechaNac = ?, Sexo = ?, Contrasena = ? WHERE ID_Paciente = ?",
                            nombre, ap_pat, ap_mat, contacto, fecha_nac, sexo, contraseña, id_paciente)
 
             # Confirmar la transacción
@@ -301,7 +417,8 @@ def modificar_paciente_post():
 
     # Si el método no es POST o hay un error, redirigir a la consola del paciente
     return redirect('/Paciente/dashboard_paciente')
-            
+
+        
 #---------------------------- Medico ----------------------------------------------------
 #---------------------------- Farmacia ----------------------------------------------------
 #---------------------------- Recepcion ----------------------------------------------------

@@ -9,12 +9,23 @@
 <body>
     <div class="container">
         <h1>Consola del Paciente</h1>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for message in messages %}
+                    <li class="{% if 'success' in message %}flash-success{% elif 'error' in message %}flash-error{% endif %}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
 
         <!-- Menú de opciones -->
         <div id="menu">
             <ul>
                 <li><a href="{{ url_for('agendar_cita') }}">Agendar Cita</a></li>
                 <li><a href="{{ url_for('modificar_paciente') }}">Modificar Datos</a></li>
+                <li><a href="{{ url_for('citas_paciente') }}">Mis citas</a></li>
+                <li><a href="{{ url_for('logout') }}">Cerrar sesion</a></li>
             </ul>
         </div>
 

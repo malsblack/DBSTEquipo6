@@ -54,6 +54,7 @@ CREATE TABLE Cita (
   ID_Recepcion VARCHAR(50) REFERENCES Recepcion(ID_Recepcion),
   FechaAtencion DATE,
   HoraAtencion TIME,
+  desc_servicio varchar(50),
   Estatus CHAR(1),
   Costo INT
 );

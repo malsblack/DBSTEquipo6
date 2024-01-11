@@ -1,0 +1,72 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #333;
+}
+
+/* Estilos para la tabla de citas */
+.citas-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.citas-table th, .citas-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.citas-table th {
+    background-color: #04AA6D;
+    color: white;
+}
+
+.citas-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.citas-table tr:hover {
+    background-color: #ddd;
+}
+
+/* Estilos para mensajes y otros elementos */
+p {
+    font-style: italic;
+    color: #888;
+}
+.btn {
+    padding: 5px 10px;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+
+.btn-modificar {
+    background-color: #f0ad4e;
+}
+
+.btn-eliminar {
+    background-color: #d9534f;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}

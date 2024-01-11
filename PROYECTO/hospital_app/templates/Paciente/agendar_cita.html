@@ -12,19 +12,19 @@
         <!-- Sección para Agendar Cita -->
         <div id="agendar-cita">
             <h2>Agendar Cita</h2>
-            <form action="/agendar_cita_post" method="post" action="{{ url_for('agendar_cita_post') }}">
-                <!-- Agregar campo de especialidad -->
+            <form  method="POST" action="{{ url_for('agendar_cita_post') }}">
+                
                 <label for="especialidad">Especialidad:</label>
-                <select id="especialidad" name="especialidad" required>
+                <select id="especialidad" name="especialidad" required onchange="cargarServiciosYDoctores()">
                     {% for id_especialidad, nombre_especialidad in especialidades %}
                         <option value="{{ id_especialidad }}">{{ nombre_especialidad }}</option>
                     {% endfor %}
                 </select>
-
+                
                 <label for="servicio">Servicio:</label>
                 <select id="servicio" name="servicio" required onchange="mostrarPrecio(this)">
                     {% for servicio in servicios %}
-                        <option value="{{ servicio[0] }}" data-precio="{{ servicio[2] }}">{{ servicio[1] }}</option>
+                        <option value="{{ servicio[2] }}" data-precio="{{ servicio[2] }}">{{ servicio[1] }}</option>
                     {% endfor %}
                 </select>
 
@@ -44,7 +44,17 @@
                 <input type="date" id="fecha" name="fecha" required min="{{ fecha_actual.strftime('%Y-%m-%d') }}">
 
                 <label for="hora">Hora:</label>
-                <input type="time" id="hora" name="hora" required>
+                <select name="hora" id="hora" required type="time">
+                    <option value="09:00">09:00</option>
+                    <option value="10:00">10:00</option>
+                    <option value="11:00">11:00</option>
+                    <option value="12:00">12:00</option>
+                    <option value="13:00">13:00</option>
+                    <option value="14:00">14:00</option>
+                    <option value="15:00">15:00</option>
+                    <option value="16:00">16:00</option>
+                    <option value="17:00">17:00</option>
+                  </select>
 
                 <button type="submit">Agendar Cita</button>
             </form>
@@ -57,6 +67,46 @@
                 // Mostrar el precio en el área de texto
                 document.getElementById('precio').value = precio;
             }
+            function cargarServiciosYDoctores() {
+                var idEspecialidad = document.getElementById('especialidad').value;
+                
+                // Realizar una solicitud AJAX a Flask
+                fetch('/cargar_servicios_doctores/' + idEspecialidad)
+                    .then(response => response.json())
+                    .then(data => {
+                        actualizarServicios(data.servicios);
+                        actualizarDoctores(data.doctores);
+                        
+                    });
+            }
+            
+            function actualizarServicios(servicios) {
+                var selectServicios = document.getElementById('servicio');
+                selectServicios.innerHTML = '';
+                servicios.forEach(servicio => {
+                    console.log(servicio)
+                    var option = document.createElement('option');
+                    option.value = servicio.ID_Servicios;
+                    option.text = servicio.Nombre;
+                    option.setAttribute('data-precio', servicio.precio); // Asegúrate de que 'Costo' es el nombre correcto del campo que contiene el precio
+                    selectServicios.appendChild(option);
+                if (servicios.length > 0) {
+                        mostrarPrecio(selectServicios);
+                    }
+                });
+            }
+            
+            function actualizarDoctores(doctores) {
+                var selectDoctores = document.getElementById('medico');
+                selectDoctores.innerHTML = '';
+                doctores.forEach(doctor => {
+                    var option = document.createElement('option');
+                    option.value = doctor.ID_Doctor;
+                    option.text = 'Dr. ' + doctor.Nombre + ' ' + doctor.Ap_Pat + ' ' + doctor.Ap_Mat;
+                    selectDoctores.appendChild(option);
+                });
+            }
+            
         </script>
 
         <!-- Otras secciones de la consola pueden ir aquí -->

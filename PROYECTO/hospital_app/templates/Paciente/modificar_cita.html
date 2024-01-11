@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='/agendar_cita.css') }}">
+    <title>Modificar Cita</title>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Sección para Modificar Cita -->
+        <div id="modificar-cita">
+            <h2>Modificar Cita</h2>
+            <form method="POST" action="{{ url_for('modificar_cita_post', id_cita=cita.ID_Cita) }}">
+                
+                <label for="especialidad">Especialidad:</label>
+                <select id="especialidad" name="especialidad" required onchange="cargarServiciosYDoctores()">
+                    {% for id_especialidad, nombre_especialidad in especialidades %}
+                        <option value="{{ id_especialidad }}" {% if id_especialidad == cita.id_especialidad %} selected {% endif %}>{{ nombre_especialidad }}</option>
+                    {% endfor %}
+                </select>
+                
+                <label for="servicio">Servicio:</label>
+                <select id="servicio" name="servicio" required onchange="mostrarPrecio(this)">
+                    <!-- Los servicios se cargarán vía JavaScript -->
+                </select>
+
+                <label>Precio:</label>
+                <textarea id="precio" readonly>{{ cita.precio }}</textarea>
+
+                <label for="medico">Médico:</label>
+                <select id="medico" name="medico" required >
+                    <!-- Los médicos se cargarán vía JavaScript -->
+                </select>
+                
+                <label for="fecha">Fecha:</label>
+                <input type="date" id="fecha" name="fecha" required value="{{ cita.fecha }}">
+
+                <label for="hora">Hora:</label>
+                <select name="hora" id="hora" required>
+                    <!-- Las opciones de hora se cargarán vía JavaScript -->
+                </select>
+
+                <button type="submit">Modificar Cita</button>
+            </form>
+        </div>
+
+        <script>
+            // JavaScript para cargar servicios, doctores y establecer la hora
+            // ... (mantén tus funciones JavaScript existentes y ajusta según sea necesario) ...
+        </script>
+
+        <!-- Otras secciones de la consola pueden ir aquí -->
+
+    </div>
+
+</body>
+</html>

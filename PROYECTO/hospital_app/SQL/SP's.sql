@@ -194,6 +194,25 @@ BEGIN
 END;
 GO
 
+CREATE PROCEDURE SP_AgregarCita
+    @ID_Paciente VARCHAR(50),
+    @ID_Doctor VARCHAR(50),
+    @ID_Recepcion VARCHAR(50),
+    @FechaAtencion date,
+    @HoraAtencion time,
+    @Estatus CHAR(1),
+    @Costo INT,
+    @desc_servicio varchar(50)
+AS
+BEGIN
+    DECLARE @ID_Cita VARCHAR(27);
+    SET @ID_Cita = dbo.GenerarIDCita(@FechaAtencion, @HoraAtencion, @ID_Paciente);
+
+    INSERT INTO Cita (ID_Cita, ID_Paciente, ID_Doctor, ID_Recepcion, desc_servicio,FechaAtencion, HoraAtencion, Estatus, Costo)
+    VALUES (@ID_Cita, @ID_Paciente, @ID_Doctor, @ID_Recepcion,@desc_servicio ,@FechaAtencion, @HoraAtencion, @Estatus, @Costo);
+END;
+GO
+
 
 
 

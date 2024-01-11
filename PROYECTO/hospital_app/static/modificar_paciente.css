@@ -50,24 +50,20 @@ button:hover {
     background-color: #0056b3;
 }
 
-.flash-messages {
-    list-style: none;
-    padding: 10px;
-    margin: 10px 0;
-}
-
-.flash-messages li {
+/* Agrega estilos para alertas de éxito */
+.flash-success {
+    background-color: #28a745; /* Color verde para alerta de éxito */
+    color: white;
     padding: 8px;
     border-radius: 4px;
     margin-bottom: 8px;
 }
 
-.flash-success {
-    background-color: #28a745; /* Color verde para alerta de éxito */
-    color: white;
-}
-
+/* Agrega estilos para alertas de error */
 .flash-error {
     background-color: #dc3545; /* Color rojo para alerta de error */
     color: white;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
 }
