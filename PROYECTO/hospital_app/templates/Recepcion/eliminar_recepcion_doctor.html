@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='registro_paciente.css') }}">
+    <title>Eliminar Paciente</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Eliminar Doctor</h1>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for message in messages %}
+                    <li class="{% if 'success' in message %}flash-success{% elif 'error' in message %}flash-error{% endif %}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+            <form action="{{ url_for('eliminar_recepcion_doctor_post') }}" id="registroForm" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta usuario?');">
+                <label for="nombre">Nombre de usuario:</label>
+                <input type="text" id="nombre" name="nombre" required>
+                <button type="submit" class="btn btn-eliminar">Eliminar</button>
+                <button class="boton-regresar" onclick="history.back()">Regresar</button>
+            </form>
+            
+
+    </div>
+</body>
+</html>

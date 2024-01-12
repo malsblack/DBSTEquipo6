@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='modificar_paciente.css') }}">
+    <title>Modificar Datos del Doctor</title>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Modificar Datos del Paciente</h1>
+
+        <!-- Formulario de modificación de datos -->
+        <form id="modificarPacienteForm" method="POST" action="{{ url_for('modificar_recepcion_doctor_post') }}">
+            <label for="nombre">Usuario:</label>
+            <input type="text" id="id_doctor" name="id_doctor" value="{{ doctor_info.ID_Doctor }}" required readonly>
+            
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" value="{{ doctor_info.Nombre }}" required>
+
+            <label for="ap_pat">Apellido Paterno:</label>
+            <input type="text" id="ap_pat" name="ap_pat" value="{{ doctor_info.Ap_Pat }}" required>
+
+            <label for="ap_mat">Apellido Materno:</label>
+            <input type="text" id="ap_mat" name="ap_mat" value="{{ doctor_info.Ap_Mat }}" required>
+
+            <label for="contacto">Contacto:</label>
+            <input type="text" id="contacto" name="contacto" value="{{ doctor_info.Contacto }}" required>
+
+            <label for="fecha_nac">Fecha de Nacimiento:</label>
+            <input type="date" id="fecha_nac" name="fecha_nac" value="{{ fecha_nacimiento_formateada }}" required>
+
+            <label for="sexo">Sexo:</label>
+            <select id="sexo" name="sexo" required>
+                <option value="M" {% if doctor_info.Sexo == 'M' %}selected{% endif %}>Masculino</option>
+                <option value="F" {% if doctor_info.Sexo == 'F' %}selected{% endif %}>Femenino</option>
+            </select>
+
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required value="{{doctor_info.Contrasena}}">
+
+
+
+
+            <!-- Otros campos de datos del doctor -->
+
+            <button type="submit">Guardar Cambios</button>
+            <button class="boton-regresar" onclick="history.back()">Regresar</button>
+        </form>
+      
+    </div>
+
+</body>
+</html>
