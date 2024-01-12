@@ -86,3 +86,71 @@ def send_registration_email(nombre, ap_pat, ap_mat, contacto, nombre_usuario):
         server.starttls()
         server.login(email['EMAIL_USERNAME'], email['EMAIL_PASSWORD'])
         server.sendmail(email['EMAIL_USERNAME'], contacto, msg.as_string())
+
+
+
+
+def send_registration_email_doctor(nombre, ap_pat, ap_mat, contacto, nombre_usuario,consultorio,especialidad):
+    email = credentials_email()
+
+    # Crear el objeto del mensaje
+    msg = MIMEMultipart()
+    msg['From'] = email['EMAIL_USERNAME']
+    msg['To'] = contacto
+    msg['Subject'] = f'¡Bienvenido a bordo Dr. {nombre}!'
+
+    # Cuerpo del mensaje con formato HTML
+    body = f'''
+    <html>
+    <head>
+        <style>
+            body {{
+                background-color: #f4f4f4; /* Color de fondo */
+                font-family: 'Arial', sans-serif;
+            }}
+            .container {{
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }}
+            h2 {{
+                color: #007bff;
+            }}
+            p {{
+                margin-bottom: 15px;
+            }}
+            .highlight {{
+                background-color: #ffff66; /* Color de resaltado */
+                font-weight: bold;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>¡Bienvenido, Dr. {nombre} {ap_pat} {ap_mat}!</h2>
+            <p>
+                Te damos la bienvenida a nuestro equipo de trabajo. Tu registro ha sido exitoso y ahora eres parte de nuestra comunidad.
+                Esperamos que con tu ayuda podamos seguir protegiendo la salud de las personas.
+            </p>
+            <p>Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarnos.</p>
+            <p>Gracias por confiar en nosotros, tu usuario es :</p>
+            <span class="highlight">{nombre_usuario}</span>
+            <p>Tu area es: </p> 
+            <span class="highlight">{especialidad}</span>.
+            <p>Tu consultorio es: </p> 
+            <span class="highlight">{consultorio}</span>.
+            <p>¡Te deseamos salud y felicidad!</p>
+        </div>
+    </body>
+    </html>
+    '''
+    msg.attach(MIMEText(body, 'html'))
+
+    # Conectar al servidor SMTP y enviar el correo
+    with smtplib.SMTP(email['EMAIL_HOST'], email['EMAIL_PORT']) as server:
+        server.starttls()
+        server.login(email['EMAIL_USERNAME'], email['EMAIL_PASSWORD'])
+        server.sendmail(email['EMAIL_USERNAME'], contacto, msg.as_string())

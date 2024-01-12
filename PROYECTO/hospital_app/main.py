@@ -2,7 +2,7 @@ from flask import Flask, render_template, request , redirect , flash, session , 
 import pyodbc
 from datetime import datetime, timedelta
 import re
-from config.utilities import db_connect,send_registration_email
+from config.utilities import *
 
 app = Flask(__name__)
 app.secret_key = 'ProyectoDSBT'
@@ -732,12 +732,33 @@ def dashboard_recepcion_usuarios_doctores():
 
 @app.route('/Recepcion/registro_recepcion_doctor')
 def registro_recepcion_doctor():
-    return render_template('/Recepcion/registro_recepcion_doctor.html')
+    def obtener_especialidades():
+            try:
+                # Ejecutar la consulta SQL para obtener las especialidades
+                cursor.execute("SELECT ID_Especialidad, Nombre FROM Especialidad")
+                # Obtener los resultados de la consulta
+                especialidades = cursor.fetchall()
+                # Confirmar la transacción
+                connection.commit()
+
+                # Devolver la lista de especialidades
+                return especialidades
+            except pyodbc.Error as ex:
+                # Si hay un error, imprimir el mensaje y hacer rollback
+                print("Error al extraer las especialidades", ex)
+                connection.rollback()
+                # En caso de error, devolver una lista vacía
+                return []
+            
+    especialidades=obtener_especialidades()
+
+    return render_template('/Recepcion/registro_recepcion_doctor.html',especialidades=especialidades)
 
 
 @app.route('/Paciente/registro_recepcion_doctor_post', methods=['POST'])
 def registro_recepcion_doctor_post():
     if request.method == 'POST':
+        
         # Obtener los datos del formulario
         nombre = request.form['nombre']
         ap_pat = request.form['ap_pat']
@@ -746,19 +767,23 @@ def registro_recepcion_doctor_post():
         fecha_nac = request.form['fecha_nac']
         sexo = request.form['sexo']
         contraseña = request.form['password']
+        piso = request.form['piso']
+        especialidad = request.form['especialidad']
 
+
+        
         # Validar que el campo de contacto sea un correo electrónico válido
         if not re.match(r"[^@]+@[^@]+\.[^@]+", contacto):
             flash("Por favor, introduce un correo electrónico válido.", 'error')
-            return redirect('/Recepcion/registro_recepcion_paciente')
+            return redirect('/Recepcion/registro_recepcion_doctor')
 
         # Verificar si el correo ya está registrado
-        cursor.execute("SELECT ID_Paciente FROM Paciente WHERE Contacto = ?", contacto)
+        cursor.execute("SELECT ID_Doctor FROM Doctor WHERE Contacto = ?", contacto)
         existing_patient = cursor.fetchone()
 
         if existing_patient:
             flash("Este correo electrónico ya está registrado. Por favor, utiliza otro.", 'error')
-            return redirect('/Recepcion/registro_recepcion_paciente')
+            return redirect('/Recepcion/registro_recepcion_doctor')
 
         # Validar la contraseña
         if not re.match(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", contraseña):
@@ -770,25 +795,41 @@ def registro_recepcion_doctor_post():
             fecha_nac = datetime.strptime(fecha_nac, '%Y-%m-%d').date()
 
             # Ejecutar el procedimiento almacenado para insertar datos de paciente
-            cursor.execute("EXEC SP_AgregarPaciente ?, ?, ?, ?, ?, ?, ?",
-                           nombre, ap_pat, ap_mat, contacto, fecha_nac, sexo, contraseña)
+            cursor.execute("EXEC SP_AgregarDoctor ?, ?, ?, ?, ?, ?, ?,?,?",
+                           nombre, ap_pat, ap_mat, contacto, fecha_nac, sexo, contraseña,"",especialidad)
 
             # Confirmar la transacción
             connection.commit()
 
             # Obtener el ID del nuevo usuario
-            cursor.execute("SELECT ID_Paciente FROM Paciente WHERE Contacto = ? ",
+            cursor.execute("SELECT ID_Doctor FROM Doctor WHERE Contacto = ? ",
                            contacto)
-            id_paciente = cursor.fetchone()[0]
+            id_doctor = cursor.fetchone()[0]
 
-            # Almacenar el ID en la variable de sesión
-            session['id_paciente'] = id_paciente
+            cursor.execute("EXEC SP_AgregarConsultorio ?, ?",
+                           id_doctor,piso)
+            # Confirmar la transacción
+            connection.commit()
 
-            send_registration_email(nombre, ap_pat, ap_mat, contacto,id_paciente)
+            cursor.execute("select ID_Consultorio from Consultorio where ID_Doctor = ?",id_doctor)
+            id_consultorio = cursor.fetchone()[0]
+            connection.commit()
+
+            cursor.execute("UPDATE Doctor SET ID_Consultorio = ? WHERE ID_Doctor = ?",id_consultorio,id_doctor)
+            connection.commit()
+
+            cursor.execute("select Nombre from Especialidad where ID_Especialidad = ?",especialidad)
+            id_especialidad = cursor.fetchone()[0]
+            connection.commit()
+            
+            
+
+
+            send_registration_email_doctor(nombre, ap_pat, ap_mat, contacto,id_doctor,id_consultorio,id_especialidad)
 
             # Mostrar mensaje flash y redirigir
-            flash(f"Registro de paciente exitoso. ID: {id_paciente}", 'success')
-            return redirect('/Recepcion/dashboard_recepcion_usuarios_pacientes')
+            flash(f"Registro de Doctor exitoso. ID: {id_doctor}", 'success')
+            return redirect('/Recepcion/dashboard_recepcion_usuarios_doctores')
 
         except pyodbc.Error as ex:
             # Si hay un error, imprimir el mensaje y hacer rollback
@@ -797,7 +838,7 @@ def registro_recepcion_doctor_post():
             connection.rollback()
 
     # Si el método no es POST o hay un error, redirigir a la página de registro del paciente
-    return redirect('/Recepcion/registro_recepcion_paciente')  
+    return redirect('/Recepcion/registro_recepcion_doctor')  
 
 
 
