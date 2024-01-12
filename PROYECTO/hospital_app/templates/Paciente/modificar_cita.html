@@ -9,50 +9,83 @@
 <body>
 
     <div class="container">
+        <!-- Sección de Resumen de la Cita Actual -->
+        <div id="resumen-cita">
+            <h2>Resumen de la Cita Actual</h2>
+            <table class="resumen-cita-estilo">
+                <tr>
+                    <td><strong>Folio:</strong></td>
+                    <td>{{ cita.ID_Cita }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Fecha:</strong></td>
+                    <td>{{ cita.FechaAtencion.strftime('%d/%m/%Y') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Hora:</strong></td>
+                    <td>{{ cita.HoraAtencion.strftime('%H:%M') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Especialidad:</strong></td>
+                    <td>{{ cita.NombreEspecialidad }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Servicio:</strong></td>
+                    <td>{{ cita.desc_servicio }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Consultorio:</strong></td>
+                    <td>{{ cita.ID_Consultorio }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Doctor:</strong></td>
+                    <td>Dr. {{ cita.NombreDoctor }} {{ cita.Apellido_Paterno_Doctor }} {{ cita.Apellido_Materno_Doctor }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Paciente:</strong></td>
+                    <td>{{ cita.NombrePaciente }} {{ cita.Apellido_Paterno_Paciente }} {{ cita.Apellido_Materno_Paciente }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Costo:</strong></td>
+                    <td>$ {{ cita.Costo }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Piso:</strong></td>
+                    <td>{{ cita.Piso_consultorio }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Numero Consultorio:</strong></td>
+                    <td>{{ cita.Num_consultorio }}</td>
+                </tr>
+            </table>
+        </div>
+
         <!-- Sección para Modificar Cita -->
         <div id="modificar-cita">
             <h2>Modificar Cita</h2>
-            <form method="POST" action="{{ url_for('modificar_cita_post', id_cita=cita.ID_Cita) }}">
-                
-                <label for="especialidad">Especialidad:</label>
-                <select id="especialidad" name="especialidad" required onchange="cargarServiciosYDoctores()">
-                    {% for id_especialidad, nombre_especialidad in especialidades %}
-                        <option value="{{ id_especialidad }}" {% if id_especialidad == cita.id_especialidad %} selected {% endif %}>{{ nombre_especialidad }}</option>
-                    {% endfor %}
-                </select>
-                
-                <label for="servicio">Servicio:</label>
-                <select id="servicio" name="servicio" required onchange="mostrarPrecio(this)">
-                    <!-- Los servicios se cargarán vía JavaScript -->
-                </select>
+            <form method="POST" action="{{ url_for('modificar_cita_post') }}">
+                <label for="fecha">Cita:</label>
+                <input id="folio" name="folio" value="{{ cita.ID_Cita }}" readonly>
+                <label for="fecha">Nueva Fecha:</label>
+                <input type="date" id="fecha" name="fecha" required min="{{ fecha_actual.strftime('%Y-%m-%d') }}" max="{{ max_fecha.strftime('%Y-%m-%d') }}" value="{{ cita.FechaAtencion }}">
 
-                <label>Precio:</label>
-                <textarea id="precio" readonly>{{ cita.precio }}</textarea>
-
-                <label for="medico">Médico:</label>
-                <select id="medico" name="medico" required >
-                    <!-- Los médicos se cargarán vía JavaScript -->
-                </select>
-                
-                <label for="fecha">Fecha:</label>
-                <input type="date" id="fecha" name="fecha" required value="{{ cita.fecha }}">
-
-                <label for="hora">Hora:</label>
+                <label for="hora">Nueva Hora:</label>
                 <select name="hora" id="hora" required>
-                    <!-- Las opciones de hora se cargarán vía JavaScript -->
+                    <option value="09:00" {% if hora_cita_formato == '09:00' %}selected{% endif %}>09:00</option>
+                    <option value="10:00" {% if hora_cita_formato == '10:00' %}selected{% endif %}>10:00</option>
+                    <option value="11:00" {% if hora_cita_formato == '11:00' %}selected{% endif %}>11:00</option>
+                    <!-- Continúa con las demás opciones de hora -->
                 </select>
 
-                <button type="submit">Modificar Cita</button>
+                <button type="submit">Reagendar Cita</button>
             </form>
+            <div id="regresar-a-citas">
+                <button class="boton-regresar" onclick="history.back()">Regresar</button>
+            </div>
+            
         </div>
 
-        <script>
-            // JavaScript para cargar servicios, doctores y establecer la hora
-            // ... (mantén tus funciones JavaScript existentes y ajusta según sea necesario) ...
-        </script>
-
         <!-- Otras secciones de la consola pueden ir aquí -->
-
     </div>
 
 </body>

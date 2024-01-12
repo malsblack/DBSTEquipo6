@@ -41,7 +41,7 @@
                 
 
                 <label for="fecha">Fecha:</label>
-                <input type="date" id="fecha" name="fecha" required min="{{ fecha_actual.strftime('%Y-%m-%d') }}">
+                <input type="date" id="fecha" name="fecha" required min="{{ fecha_actual.strftime('%Y-%m-%d') }}" max="{{max_fecha.strftime('%Y-%m-%d')}}">
 
                 <label for="hora">Hora:</label>
                 <select name="hora" id="hora" required type="time">
@@ -58,6 +58,7 @@
 
                 <button type="submit">Agendar Cita</button>
             </form>
+            <button class="boton-regresar" onclick="history.back()">Regresar</button>
         </div>
         <script>
             function mostrarPrecio(selectElement) {

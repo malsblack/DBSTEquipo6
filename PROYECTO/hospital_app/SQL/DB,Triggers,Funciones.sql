@@ -35,7 +35,7 @@ CREATE TABLE Recepcion (
   Contrasena VARCHAR(50)
 );
 
-----Crear estas tablas después
+----Crear estas tablas despuï¿½s
 
 CREATE TABLE Doctor (
   ID_Doctor VARCHAR(50) PRIMARY KEY,
@@ -58,7 +58,8 @@ CREATE TABLE Cita (
   FechaAtencion DATE,
   HoraAtencion TIME,
   Estatus CHAR(1),
-  Costo INT
+  Costo INT,
+  desc_servicio VARCHAR(50)
 );
 
 CREATE TABLE Servicios (
@@ -88,7 +89,7 @@ CREATE TABLE DetalleReceta (
 
 ----Funciones
 
-----Crear una función para el ID del paciente
+----Crear una funciï¿½n para el ID del paciente
 
 CREATE FUNCTION GenerarIDPaciente(
 	@Nombre VARCHAR (50)
@@ -104,7 +105,7 @@ BEGIN
 	----Primera parte: Agarra las Iniciales del Nombre, Apellido paterno y Apellido materno
 	SET @Iniciales = LEFT(@Nombre, 1) + LEFT(@Ap_Pat, 1) + LEFT(@Ap_Mat, 1)
 
-	----Segunda parte: Agarra el día y el mes de la fecha de nacimiento
+	----Segunda parte: Agarra el dï¿½a y el mes de la fecha de nacimiento
 	SET @Fecha = FORMAT(@FechaNac, 'ddMM')
 
 	----Tercera parte: En primero valida si despues de la primera y segunda parte hay duplicidad y sino hay otro elemento igual se genera el primer registro o se incrementa en uno a los registros que ya esta en la tabla
@@ -118,7 +119,7 @@ BEGIN
 	RETURN @ID
 END;
 
-----Crear una función para el ID Doctor
+----Crear una funciï¿½n para el ID Doctor
 
 CREATE FUNCTION GenerarIDDoctor(
 	@Nombre VARCHAR (50)
@@ -135,7 +136,7 @@ BEGIN
 	----Primera parte: Agarra las Iniciales del Nombre, Apellido paterno y Apellido materno
 	SET @Iniciales = LEFT(@Nombre, 1) + LEFT(@Ap_Pat, 1) + LEFT(@Ap_Mat, 1)
 
-	----Segunda parte: Agarra el año de la fecha de nacimiento
+	----Segunda parte: Agarra el aï¿½o de la fecha de nacimiento
 	SET @Fecha = FORMAT(@FechaNac, 'yyyy')
 
 	----Tercera parte: Se valida el ID que tiene la especialidad y se guarda en la variable 
@@ -154,7 +155,7 @@ BEGIN
 	RETURN @ID
 END;
 
-----Crear una función para el ID Recepcion
+----Crear una funciï¿½n para el ID Recepcion
 
 CREATE FUNCTION GenerarIDRecepcion(
 	@Nombre VARCHAR (50)
@@ -170,7 +171,7 @@ BEGIN
 	----Primera parte: Agarra las Iniciales del Nombre, Apellido paterno y Apellido materno
 	SET @Iniciales = LEFT(@Nombre, 1) + LEFT(@Ap_Pat, 1) + LEFT(@Ap_Mat, 1)
 
-	----Segunda parte: Agarra el año de la fecha de nacimiento
+	----Segunda parte: Agarra el aï¿½o de la fecha de nacimiento
 	SET @Fecha = FORMAT(@FechaNac, 'yyyy')
 		
 	----Cuarta parte: En primero valida si despues de la primera, segunda y tercera parte hay duplicidad y sino hay otro elemento igual se genera el primer registro o se incrementa en uno a los registros que ya esta en la tabla
@@ -184,7 +185,7 @@ BEGIN
 	RETURN @ID
 END;
 
-----Crear una función para el ID Cita
+----Crear una funciï¿½n para el ID Cita
 
 CREATE FUNCTION GenerarIDCita(
 	@FechaAtencion DATE
@@ -196,7 +197,7 @@ AS
 BEGIN
 	DECLARE	@ID VARCHAR(50), @Fecha VARCHAR(8), @Hora VARCHAR(2)
 
-	----Primera parte: Ajusta el formato de año, mes y día de la cita 
+	----Primera parte: Ajusta el formato de aï¿½o, mes y dï¿½a de la cita 
 	SET @Fecha = FORMAT(@FechaAtencion, 'yyyyMMdd')
 	
 	----Segunda parte: Extrae la hora de la cita
@@ -208,7 +209,7 @@ BEGIN
 	RETURN @ID
 END;
 
-----Crear una función para el ID Receta
+----Crear una funciï¿½n para el ID Receta
 
 CREATE FUNCTION GenerarIDReceta(
 	@ID_Cita VARCHAR (50)
@@ -223,7 +224,7 @@ BEGIN
 	RETURN @ID
 END;
 
-----Crear una función para el ID Detalle Receta
+----Crear una funciï¿½n para el ID Detalle Receta
 
 CREATE FUNCTION GenerarIDDetalleReceta(
 	@ID_Cita VARCHAR (50)
@@ -328,7 +329,7 @@ BEGIN
   FROM DELETED 
 END;
 
-----Trigger AgregarRecepción
+----Trigger AgregarRecepciï¿½n
 CREATE TRIGGER AgregarRecepcion
 ON Recepcion
 AFTER INSERT
@@ -341,7 +342,7 @@ BEGIN
   FROM INSERTED 
 END;
 
-----Trigger ActualizarRecepción
+----Trigger ActualizarRecepciï¿½n
 CREATE TRIGGER ActualizarRecepcion
 ON Recepcion
 AFTER UPDATE
@@ -354,8 +355,8 @@ BEGIN
   FROM INSERTED 
 END;
 
-----Trigger BorrarRecepción
-CREATE TRIGGER BorrarRecepción
+----Trigger BorrarRecepciï¿½n
+CREATE TRIGGER BorrarRecepciï¿½n
 ON Recepcion
 AFTER DELETE
 AS

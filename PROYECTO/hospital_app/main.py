@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request , redirect , flash, session , jsonify
 import pyodbc
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 from config.utilities import db_connect,send_registration_email
 
@@ -26,6 +26,7 @@ def logout():
 
 @app.route('/Paciente/login_paciente')
 def login_paciente():
+    print(session)
     return render_template('/Paciente/login_paciente.html')
 
 @app.route('/Paciente/login_paciente_post',methods = ['POST'])
@@ -201,7 +202,8 @@ def agendar_cita():
     servicios=obtener_servicios()
     medicos = obtener_doctores()
     fecha_actual = datetime.now().date()
-    return render_template('/Paciente/agendar_cita.html',fecha_actual=fecha_actual,especialidades=especialidades,servicios=servicios,medicos=medicos)
+    max_fecha = fecha_actual + timedelta(days=90)
+    return render_template('/Paciente/agendar_cita.html',fecha_actual=fecha_actual,max_fecha=max_fecha,especialidades=especialidades,servicios=servicios,medicos=medicos)
 
 @app.route('/Paciente/agendar_cita_post', methods=['POST'])
 def agendar_cita_post():
@@ -211,30 +213,36 @@ def agendar_cita_post():
     
     if request.method == 'POST':
         # Obtener los datos del formulario
-
-
-
         try:
             id_paciente = session.get('id_paciente')
-            print(id_paciente)
             id_medico = request.form['medico']
-            print(id_medico)
             fecha = request.form['fecha']
-            print(fecha)
             hora = request.form['hora']
-            print(hora)
             servicio=request.form['servicio']
 
             cursor.execute(f"Select Nombre from Consultas_Servicios Where ID_Servicios = '{servicio}'")
             desc_servicio = cursor.fetchone()[0]
             connection.commit()
-            print(desc_servicio)
 
             cursor.execute(f"Select Costo from Consultas_Servicios Where ID_Servicios = '{servicio}'")
             costo = cursor.fetchone()[0]
             connection.commit()
-            print(costo)
             
+            fecha_cita = datetime.strptime(fecha, '%Y-%m-%d').date()
+            hora_cita = datetime.strptime(hora, '%H:%M').time()
+
+            if fecha_cita < datetime.now().date() or (fecha_cita == datetime.now().date() and hora_cita < datetime.now().time()):
+                flash("La fecha y hora deben ser futuras", "error")
+                return redirect('/Paciente/agendar_cita')
+            
+
+            cursor.execute("SELECT * FROM VistaDetalleCita WHERE FechaAtencion = ? AND HoraAtencion = ? AND ID_Doctor = ?", fecha,hora, id_medico)
+            citas_doctor = cursor.fetchone()
+            connection.commit()
+
+            if citas_doctor:
+                print("El doctor ya tiene una cita en esta fecha y hora", "error")
+                return redirect('/Paciente/agendar_cita')
 
 
 
@@ -242,7 +250,7 @@ def agendar_cita_post():
             sp_query = "EXEC SP_AgregarCita ?, ?, ?, ?, ?, ?, ?, ?"
             cursor.execute(sp_query, id_paciente, id_medico, 'ADMIN20230', fecha, hora, 'S', costo, desc_servicio)
             connection.commit()
-            print("pase")
+       
 
             # Mostrar mensaje flash y redirigir
             flash("Cita agendada exitosamente.", 'success')
@@ -278,52 +286,77 @@ def citas_paciente():
         flash("Debes iniciar sesión para acceder a la consola del paciente.", 'error')
         return redirect('/Paciente/login_paciente')
     id_paciente = session.get('id_paciente')
-    cursor.execute("SELECT * from Cita Where ID_Paciente= ?", id_paciente)
+    cursor.execute("SELECT * from VistaDetalleCita Where ID_Paciente= ?", id_paciente)
     citas = cursor.fetchall()
 
     return render_template('/Paciente/citas_paciente.html',citas=citas)  
 
-@app.route('/modificar_cita/<id_cita>')
+
+@app.route('/modificar_cita/<id_cita>', methods=['GET'])
 def modificar_cita(id_cita):
 
-    cursor.execute("SELECT * FROM Cita WHERE ID_Cita = ?", id_cita)
+    cursor.execute("SELECT * FROM VistaDetalleCita WHERE ID_Cita = ?", id_cita)
     detalles_cita = cursor.fetchone()
+    connection.commit()
     fecha_actual = datetime.now().date()
-    print(detalles_cita)
-
-    # Pasa estos detalles a la plantilla
-    return render_template('/Paciente/modificar_cita.html', cita=detalles_cita,fecha_actual=fecha_actual)
+    max_fecha = fecha_actual + timedelta(days=90)
+    hora_cita_formato = detalles_cita.HoraAtencion.strftime('%H:%M')
 
 
-@app.route('/modificar_cita_post/<id_cita>', methods=['POST'])
-def modificar_cita_post(id_cita):
-    # Obtén los datos del formulario
-    especialidad = request.form.get('especialidad')
-    servicio = request.form.get('servicio')
-    medico = request.form.get('medico')
-    fecha = request.form.get('fecha')
-    hora = request.form.get('hora')
-    # Asegúrate de validar estos datos antes de usarlos
+    return render_template('/Paciente/modificar_cita.html', cita=detalles_cita,fecha_actual=fecha_actual,hora_cita_formato=hora_cita_formato,max_fecha=max_fecha)
 
+@app.route('/modificar_cita_post/', methods=['POST'])
+def modificar_cita_post():
+    if request.method == 'POST':
+        folio=request.form.get('folio')
+        fecha = request.form.get('fecha')
+        hora = request.form.get('hora')
+        # Otros campos como sea necesario
+
+        try:
+            fecha_cita = datetime.strptime(fecha, '%Y-%m-%d').date()
+            hora_cita = datetime.strptime(hora, '%H:%M').time()
+
+            if fecha_cita < datetime.now().date() or (fecha_cita == datetime.now().date() and hora_cita < datetime.now().time()):
+                flash("La fecha y hora deben ser futuras", "error")
+                return redirect('/modificar_cita')
+            
+            cursor.execute("SELECT * FROM VistaDetalleCita WHERE ID_Cita = ?", folio)
+            detalles_cita = cursor.fetchone()
+            connection.commit()
+
+            cursor.execute("SELECT * FROM VistaDetalleCita WHERE FechaAtencion = ? AND HoraAtencion = ? AND ID_Doctor = ?", fecha,hora, detalles_cita.ID_Doctor)
+            citas_doctor = cursor.fetchone()
+            connection.commit()
+
+            if citas_doctor:
+                print("El doctor ya tiene una cita en esta fecha y hora", "error")
+                return redirect('/Paciente/citas_paciente')
+            
+            cursor.execute("UPDATE Cita SET FechaAtencion = ?, HoraAtencion = ? WHERE ID_Cita = ?", (fecha_cita, hora_cita, folio))
+            connection.commit()
+
+            print("Cita modificada con éxito", "success")
+            return redirect('/Paciente/citas_paciente')
+        except Exception as e:
+
+            flash("Error al modificar la cita: " + str(e), "error")
+
+    return render_template('/Paciente/citas_paciente')
+
+
+@app.route('/eliminar_cita/<id_cita>', methods=['POST'])
+def eliminar_cita(id_cita):
     try:
-        # Aquí asumo que tienes una conexión a la base de datos establecida como 'cursor'
-        # Actualiza la cita en la base de datos
-        #update_query = """
-         #   UPDATE Cita 
-          #  SET id_especialidad = ?, id_servicio = ?, id_medico = ?, fecha = ?, hora = ? 
-           # WHERE ID_Cita = ?
-        #"""
-        #cursor.execute(update_query, (especialidad, servicio, medico, fecha, hora, id_cita))
-        #cursor.commit()
+        cursor.execute("DELETE FROM Cita WHERE ID_Cita = ?", (id_cita))
+        connection.commit()
 
-        flash('Cita modificada con éxito', 'success')
+        flash("Cita eliminada con éxito.", "success")
     except Exception as e:
-        # Manejar la excepción
-        flash('Ocurrió un error al modificar la cita', 'error')
-        print(e)  # Para depuración
+        flash("No se pudo eliminar la cita: " + str(e), "error")
 
+    # Redireccionar al usuario de vuelta a la página de citas
     return redirect('/Paciente/citas_paciente')
-
 
 
 

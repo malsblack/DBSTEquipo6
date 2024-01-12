@@ -18,9 +18,10 @@ body {
 h2 {
     text-align: center;
     color: #333;
+    margin-bottom: 20px; /* Espaciado debajo de los títulos */
 }
 
-#agendar-cita {
+#agendar-cita, #resumen-cita {
     margin-top: 30px;
 }
 
@@ -53,23 +54,27 @@ button:hover {
     background-color: #45a049;
 }
 
-/* Agrega un estilo para resaltar la entrada activa */
+/* Resalta la entrada activa */
 input:focus, select:focus {
     outline: 2px solid #4caf50;
     border-color: #4caf50;
 }
 
+/* Estilos para la tabla del resumen de la cita */
 .resumen-cita-estilo {
     border-collapse: collapse;
     width: 100%;
     margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra para la tabla */
 }
 
 .resumen-cita-estilo td {
     border: 1px solid #ddd;
     padding: 8px;
+    text-align: left; /* Alineación del texto a la izquierda */
 }
 
 .resumen-cita-estilo tr:nth-child(even) {background-color: #f2f2f2;}
 
 .resumen-cita-estilo tr:hover {background-color: #ddd;}
+

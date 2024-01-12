@@ -1,9 +1,11 @@
 /* Estilos generales */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+    color: #333; /* Color de texto general */
+    font-size: 14px; /* Tamaño de fuente reducido para todo el cuerpo */
 }
 
 .container {
@@ -16,7 +18,9 @@ body {
 }
 
 h1 {
-    color: #333;
+    text-align: center; /* Centrar el título */
+    margin-bottom: 20px;
+    font-size: 20px; /* Tamaño de fuente más grande para el título */
 }
 
 /* Estilos para la tabla de citas */
@@ -25,16 +29,17 @@ h1 {
     border-collapse: collapse;
     margin-top: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 13px; /* Tamaño de fuente más pequeño para la tabla */
 }
 
 .citas-table th, .citas-table td {
     border: 1px solid #ddd;
-    padding: 10px;
+    padding: 8px; /* Ajustar el relleno */
     text-align: left;
 }
 
 .citas-table th {
-    background-color: #04AA6D;
+    background-color: #0275d8; /* Color más oscuro para los encabezados */
     color: white;
 }
 
@@ -43,30 +48,12 @@ h1 {
 }
 
 .citas-table tr:hover {
-    background-color: #ddd;
+    background-color: #ddd; /* Resaltar filas al pasar el mouse */
 }
 
 /* Estilos para mensajes y otros elementos */
 p {
     font-style: italic;
-    color: #888;
-}
-.btn {
-    padding: 5px 10px;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-right: 5px;
-}
-
-.btn-modificar {
-    background-color: #f0ad4e;
-}
-
-.btn-eliminar {
-    background-color: #d9534f;
-}
-
-.btn:hover {
-    opacity: 0.8;
-}
+    color: #666;
+    text-align: center; /* Centrar los mensajes */
+    font-size: 14px; /* Tamaño de fuente para
