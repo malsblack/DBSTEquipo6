@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='registro_paciente.css') }}">
+    <title>Registro de Paciente</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Registro de Paciente</h1>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for message in messages %}
+                    <li class="{% if 'success' in message %}flash-success{% elif 'error' in message %}flash-error{% endif %}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+        <!-- Formulario de registro -->
+        <form id="registroForm" method="POST" action="{{ url_for('registro_paciente_post') }}">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required>
+
+            <label for="ap_pat">Apellido Paterno:</label>
+            <input type="text" id="ap_pat" name="ap_pat" required>
+
+            <label for="ap_mat">Apellido Materno:</label>
+            <input type="text" id="ap_mat" name="ap_mat" required>
+
+            <label for="contacto">Contacto:</label>
+            <input type="text" id="contacto" name="contacto" required>
+
+            <label for="fecha_nac">Fecha de Nacimiento:</label>
+            <input type="date" id="fecha_nac" name="fecha_nac" required>
+
+            <label for="sexo">Sexo:</label>
+            <select id="sexo" name="sexo" required>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+            </select>
+
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Registrar</button>
+        </form>
+    </div>
+</body>
+</html>
