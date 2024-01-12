@@ -348,6 +348,18 @@ def modificar_cita_post():
 @app.route('/eliminar_cita/<id_cita>', methods=['POST'])
 def eliminar_cita(id_cita):
     try:
+        cursor.execute("SELECT FechaAtencion, HoraAtencion FROM Cita WHERE ID_Cita = ?", (id_cita))
+        cita = cursor.fetchone()
+        connection.commit()
+
+        # Combinar fecha y hora de la cita y convertirlas a objeto datetime
+        fecha_hora_cita = datetime.combine(cita.FechaAtencion, cita.HoraAtencion)
+
+        # Verificar si la cita está al menos a 24 horas de distancia
+        if (fecha_hora_cita - datetime.now()) < timedelta(hours=24):
+            flash("No se puede cancelar la cita con menos de 24 horas de anticipación.", "error")
+            return redirect('/Paciente/citas_paciente')
+
         cursor.execute("DELETE FROM Cita WHERE ID_Cita = ?", (id_cita))
         connection.commit()
 
