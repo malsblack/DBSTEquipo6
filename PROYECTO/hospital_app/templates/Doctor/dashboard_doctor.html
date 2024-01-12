@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='consola_paciente.css') }}">
+    <title>Consola del Paciente</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Consola del Doctor</h1>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for message in messages %}
+                    <li class="{% if 'success' in message %}flash-success{% elif 'error' in message %}flash-error{% endif %}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Menú de opciones -->
+        <div id="menu">
+            <ul>
+                <li><a href="{{ url_for('citas_paciente') }}">Ver Citas</a></li>
+            </ul>
+        </div>
+
+        <!-- Contenido dinámico se cargará aquí -->
+
+    </div>
+</body>
+</html>

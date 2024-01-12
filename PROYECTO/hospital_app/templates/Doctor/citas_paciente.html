@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='citas_paciente.css') }}">
+    <title>Mis Citas</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Mis Citas</h1>
+       
+        <!-- Contenido dinámico de las citas -->
+        <div id="citas">
+            {% if citas %}
+                <table class="citas-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Especialidad</th>
+                            <th>Servicio</th>
+                            <th>Consultorio</th>
+                            <th>Doctor</th>
+                            <th>Costo</th>
+                            <th>Estatus</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cita in citas %}
+                            <tr>
+                                <td>{{ cita.FechaAtencion }}</td>
+                                <td>{{ cita.HoraAtencion }}</td>
+                                <td>{{ cita.NombreEspecialidad }}</td>
+                                <td>{{ cita.desc_servicio }}</td>
+                                <td>{{ cita.ID_Consultorio }}</td>
+                                <td>Dr. {{ cita.NombreDoctor }} {{ cita.Apellido_Paterno_Doctor }} {{ cita.Apellido_Materno_Doctor }}</td>
+                                <td>$ {{ cita.Costo }}</td>
+                                <td>{{ cita.Estatus}}</td>
+
+                                <td>
+                                    <a href="{{ url_for('modificar_cita', id_cita=cita.ID_Cita) }}" class="btn btn-modificar">Modificar</a>
+                                    <form action="{{ url_for('eliminar_cita', id_cita=cita.ID_Cita) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta cita?');">
+                                        <button type="submit" class="btn btn-eliminar">Eliminar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+            {% else %}
+                <p>No tienes citas programadas.</p>
+            {% endif %}
+        </div>
+        <button class="boton-regresar" onclick="history.back()">Regresar</button>
+
+    </div>
+</body>
+</html>
