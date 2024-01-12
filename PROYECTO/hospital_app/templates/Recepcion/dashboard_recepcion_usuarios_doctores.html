@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='consola_paciente.css') }}">
-    <title>Gestion de Pacientes</title>
+    <title>Gestion de Doctores</title>
 </head>
 <body>
     <div class="container">
-        <h1>Gestion de Pacientes</h1>
+        <h1>Gestion de Doctores</h1>
         {% with messages = get_flashed_messages() %}
         {% if messages %}
             <ul class="flash-messages">
@@ -22,9 +22,9 @@
         <!-- Menú de opciones -->
         <div id="menu">
             <ul>
-                <li><a href="{{ url_for('registro_recepcion_paciente') }}">Registrar Paciente</a></li>
-                <li><a href="{{ url_for('eliminar_recepcion_paciente') }}">Eliminar Paciente</a></li>
-                <li><a href="{{ url_for('modi_recepcion_paciente') }}">Editar Paciente</a></li>
+                <li><a href="{{ url_for('registro_recepcion_doctor') }}">Registrar Doctor</a></li>
+                <li><a href="">Eliminar Doctor</a></li>
+                <li><a href="">Editar Doctor</a></li>
 
 
             </ul>

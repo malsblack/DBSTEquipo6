@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='registro_paciente.css') }}">
-    <title>Registro de Paciente</title>
+    <title>Registro de Medico</title>
 </head>
 <body>
     <div class="container">
-        <h1>Registro de Paciente</h1>
+        <h1>Registro de Medico</h1>
 
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -21,7 +21,7 @@
     {% endwith %}
 
         <!-- Formulario de registro -->
-        <form id="registroForm" method="POST" action="{{ url_for('registro_recepcion_paciente_post') }}">
+        <form id="registroForm" method="POST" action="{{ url_for('registro_recepcion_doctor_post') }}">
             <label for="nombre">Nombre:</label>
             <input type="text" id="nombre" name="nombre" required>
 
