@@ -4,16 +4,18 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+    background-image: url("/static//Images/citaMedica.jpg");
     color: #333; /* Color de texto general */
     font-size: 14px; /* Tamaño de fuente reducido para todo el cuerpo */
 }
 
 .container {
     max-width: 800px;
-    margin: 20px auto;
-    background-color: #fff;
+    margin: 50px auto;
     padding: 20px;
+    border: 1px solid #ccc;
     border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.45);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -56,4 +58,22 @@ p {
     font-style: italic;
     color: #666;
     text-align: center; /* Centrar los mensajes */
-    font-size: 14px; /* Tamaño de fuente para
+    font-size: 14px; /* Tamaño de fuente para*/
+}
+
+button {
+    background-color: #af4c4c;
+    color: white;
+    cursor: pointer;
+    margin: .8rem 0;
+    border-radius: 10%;
+    border: none;
+}
+
+.boton-regresar{
+    border-radius: 10%;
+    border: none;
+    background-color: #0275d8;
+    margin: .5rem;
+    padding: .5rem;
+}

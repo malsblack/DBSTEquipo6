@@ -2,7 +2,9 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f5f5f5;
+    background-image: url("/static/Images/citaMedica.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .container {
@@ -11,8 +13,13 @@ body {
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.45);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+textarea{
+    resize: none;
+    background-color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 2rem;
 }
 
 h2 {
@@ -21,6 +28,8 @@ h2 {
 }
 
 #agendar-cita {
+    position: relative;
+    align-items: center;
     margin-top: 30px;
 }
 
@@ -35,6 +44,8 @@ label {
 }
 
 input, select, button {
+    
+    background-color: rgba(255, 255, 255, 0.45);
     margin-bottom: 16px;
     padding: 10px;
     border: 1px solid #ccc;
@@ -44,9 +55,18 @@ input, select, button {
 }
 
 button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50%  ;
     background-color: #4caf50;
     color: white;
     cursor: pointer;
+}
+
+.boton-regresar{
+    margin-left: 25%;
 }
 
 button:hover {

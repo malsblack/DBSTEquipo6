@@ -1,69 +1,92 @@
-/* styles.css */
-
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f5f5f5;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    background-image: url("/static/Images/citaMedica.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .container {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 50px auto;
     padding: 20px;
-    background-color: #fff;
+    border: 1px solid #ccc;
     border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.45);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+textarea{
+    resize: none;
+    background-color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 2rem;
+}
 
-h1 {
+h2 {
+    text-align: center;
     color: #333;
 }
 
+#agendar-cita {
+    position: relative;
+    align-items: center;
+    margin-top: 30px;
+}
+
 form {
-    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 label {
-    display: block;
     margin-bottom: 8px;
 }
 
-input,
-select {
-    width: 100%;
-    padding: 8px;
+input, select, button {
+    
+    background-color: rgba(255, 255, 255, 0.45);
     margin-bottom: 16px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
     box-sizing: border-box;
 }
 
 button {
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50%  ;
+    background-color: #4caf50;
+    color: white;
     cursor: pointer;
 }
 
+
 button:hover {
-    background-color: #0056b3;
+    background-color: #45a049;
 }
 
-/* Agrega estilos para alertas de éxito */
-.flash-success {
-    background-color: #28a745; /* Color verde para alerta de éxito */
-    color: white;
-    padding: 8px;
-    border-radius: 4px;
-    margin-bottom: 8px;
+/* Agrega un estilo para resaltar la entrada activa */
+input:focus, select:focus {
+    outline: 2px solid #4caf50;
+    border-color: #4caf50;
 }
 
-/* Agrega estilos para alertas de error */
-.flash-error {
-    background-color: #dc3545; /* Color rojo para alerta de error */
-    color: white;
-    padding: 8px;
-    border-radius: 4px;
-    margin-bottom: 8px;
+.resumen-cita-estilo {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
 }
+
+.resumen-cita-estilo td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.resumen-cita-estilo tr:nth-child(even) {background-color: #f2f2f2;}
+
+.resumen-cita-estilo tr:hover {background-color: #ddd;}

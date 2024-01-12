@@ -9,8 +9,7 @@
 <body>
     <div class="container">
         <h1>Mis Citas</h1>
-        <button class="boton-regresar" onclick="history.back()">Regresar</button>
-
+       
         <!-- Contenido dinámico de las citas -->
         <div id="citas">
             {% if citas %}
@@ -50,10 +49,13 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                
             {% else %}
                 <p>No tienes citas programadas.</p>
             {% endif %}
         </div>
+        <button class="boton-regresar" onclick="history.back()">Regresar</button>
+
     </div>
 </body>
 </html>

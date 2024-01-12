@@ -1,22 +1,22 @@
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4;
+    background-image: url("/static//Images/doctor.jpg");
     margin: 0;
     padding: 0;
 }
 
 .container {
-    width: 80%;
-    max-width: 600px;
-    margin: 50px auto;
-    background-color: #fff;
-    padding: 20px;
+    max-width: 40rem;
+    min-height: 15rem;
+    margin: 15rem auto;
+    background-color: rgba(255, 255, 255, 0.45);
+    padding: 5rem 5rem 5rem 5rem;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
 }
 
 h1 {
-    color: #333;
+    color: #5E9FF2;
     text-align: center;
 }
 
@@ -33,13 +33,13 @@ p {
 
 .button {
     display: inline-block;
-    padding: 10px 20px;
+    padding: 1rem 1.5rem ;
     text-align: center;
     text-decoration: none;
     color: #fff;
-    background-color: #007bff;
+    background-color: #327AD9;
     border-radius: 4px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.15s ease;
 }
 
 .button:hover {
