@@ -919,8 +919,7 @@ def modificar_recepcion_doctor_post():
 
 
         if not re.match(r"[^@]+@[^@]+\.[^@]+", contacto):
-            flash("Por favor, introduce un correo electrónico válido.", 'error')
-            return redirect('/Recepcion/modificar_recepcion_doctor_post')
+            return redirect('/Recepcion/modi_recepcion_doctor')
         print("pase correo")
         
         # Verificar si el correo ya está registrado
@@ -934,13 +933,11 @@ def modificar_recepcion_doctor_post():
             cursor.execute("SELECT ID_Doctor FROM Doctor WHERE Contacto = ?", contacto)
             existing_patient_contact = cursor.fetchone()
             if existing_patient_contact:
-                flash("Este correo electrónico ya está registrado. Por favor, utiliza otro.", 'error')
-                return redirect('/Recepcion/modificar_recepcion_doctor_post')
+                return redirect('/Recepcion/modi_recepcion_doctor')
 
         # Validar la contraseña
         if not re.match(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", contraseña):
-            flash("La contraseña debe tener al menos 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial y una longitud mínima de 8 caracteres.", 'error')
-            return redirect('/Recepcion/modificar_recepcion_doctor_post')
+            return redirect('/Recepcion/modi_recepcion_doctor')
         
         print("validaciones ok")
 
@@ -968,16 +965,31 @@ def modificar_recepcion_doctor_post():
     return redirect('/Recepcion/dashboard_recepcion_usuarios_doctores')
 
 
-
+@app.route('/Recepcion/ver_recepcion_doctores')
+def ver_recepcion_doctores():
+    cursor.execute("select ID_Doctor, Nombre, Ap_Pat, Ap_Mat, Contacto, ID_Consultorio, ID_Especialidad from Doctor")
+    doctores=cursor.fetchall()
+    connection.commit()
+    
+    return render_template('/Recepcion/ver_recepcion_doctores.html',doctores=doctores)
 
 
 
 
 #---------------------------- Medico ----------------------------------------------------
+
+
+@app.route('/Doctor/login_doctor')
+def login_doctor():
+    return render_template('/Doctor/login_Doctor.html')
+
+
+
+
+
+
 #---------------------------- Farmacia ----------------------------------------------------
-@app.route('/medico')
-def medico():
-    return render_template('medico.html')
+
 
 @app.route('/farmacia')
 def farmacia():

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='citas_paciente.css') }}">
+    <title>Mis Citas</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Mis Citas</h1>
+       
+        <!-- Contenido dinámico de las citas -->
+        <div id="citas">
+            {% if doctores %}
+                <table class="citas-table">
+                    <thead>
+                        <tr>
+                            <th>ID_Doctor</th>
+                            <th>Nombre</th>
+                            <th>Apellido Paterno</th>
+                            <th>Apellido Materno</th>
+                            <th>Contacto</th>
+                            <th>Consultorio</th>
+                            <th>Especialidad</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doctor in doctores %}
+                            <tr>
+                                <td>{{ doctor.ID_Doctor }}</td>
+                                <td>{{ doctor.Nombre }}</td>
+                                <td>{{ doctor.Ap_Pat }}</td>
+                                <td>{{ doctor.Ap_Mat }}</td>
+                                <td>{{ doctor.Contacto }}</td>
+                                <td>{{ doctor.ID_Consultorio }}</td>
+                                <td>{{ doctor.ID_Especialidad }}</td>
+
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+            {% else %}
+                <p>No tienes citas programadas.</p>
+            {% endif %}
+        </div>
+        <button class="boton-regresar" onclick="history.back()">Regresar</button>
+
+    </div>
+</body>
+</html>
