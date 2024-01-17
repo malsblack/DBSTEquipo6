@@ -478,3 +478,191 @@ BEGIN
 
 	RETURN @ID
 END;
+---------------------------------------triggers
+
+
+USE [PROYECTODBST]
+GO
+/****** Object:  Trigger [dbo].[ActualizarDoctor]    Script Date: 16/01/2024 07:29:47 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER TRIGGER [dbo].[ActualizarDoctor]
+ON [dbo].[Doctor]
+AFTER UPDATE
+AS
+BEGIN
+  SET NOCOUNT ON;
+  DECLARE @Usuario VARCHAR(50);
+  SELECT @Usuario = SUSER_SNAME();
+  INSERT INTO Bitacora (Fecha, Hora, ID_Usuario, Accion, TablaAfectada, Descripcion)
+  SELECT CAST(GETDATE() AS date), CAST(GETDATE() AS time), @Usuario, 'Actualizar', 'Doctor', 'Se actualizo el Doctor con ID: ' + ID_Doctor
+  FROM INSERTED 
+END;
+
+
+USE [PROYECTODBST]
+GO
+/****** Object:  Trigger [dbo].[AgregarDoctor]    Script Date: 16/01/2024 07:30:10 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER TRIGGER [dbo].[AgregarDoctor]
+ON [dbo].[Doctor]
+AFTER INSERT
+AS
+BEGIN
+  SET NOCOUNT ON;
+  DECLARE @Usuario VARCHAR(50);
+  SELECT @Usuario = SUSER_SNAME();
+  INSERT INTO Bitacora (Fecha, Hora, ID_Usuario, Accion, TablaAfectada, Descripcion)
+  SELECT CAST(GETDATE() AS date), CAST(GETDATE() AS time), @Usuario, 'Agregar', 'Doctor', 'Se agrego el Doctor con ID: ' + ID_Doctor
+  FROM INSERTED 
+END;
+
+
+USE [PROYECTODBST]
+GO
+/****** Object:  Trigger [dbo].[BorrarDoctor]    Script Date: 16/01/2024 07:30:22 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER TRIGGER [dbo].[BorrarDoctor]
+ON [dbo].[Doctor]
+AFTER DELETE
+AS
+BEGIN
+  SET NOCOUNT ON;
+  DECLARE @Usuario VARCHAR(50);
+  SELECT @Usuario = SUSER_SNAME();
+  INSERT INTO Bitacora (Fecha, Hora, ID_Usuario, Accion, TablaAfectada, Descripcion)
+  SELECT CAST(GETDATE() AS date), CAST(GETDATE() AS time), @Usuario, 'Borrar', 'Doctor', 'Se borro el Doctor con ID: ' + ID_Doctor
+  FROM DELETED 
+END;
+
+
+USE [PROYECTODBST]
+GO
+/****** Object:  Trigger [dbo].[ActualizarPaciente]    Script Date: 16/01/2024 07:30:46 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER TRIGGER [dbo].[ActualizarPaciente]
+ON [dbo].[Paciente]
+AFTER UPDATE
+AS
+BEGIN
+  SET NOCOUNT ON;
+  DECLARE @Usuario VARCHAR(50);
+  SELECT @Usuario = SUSER_SNAME();
+  INSERT INTO Bitacora (Fecha, Hora, ID_Usuario, Accion, TablaAfectada, Descripcion)
+  SELECT CAST(GETDATE() AS date), CAST(GETDATE() AS time), @Usuario, 'Actualizar', 'Paciente', 'Se actualizo el Paciente con ID: ' + ID_Paciente
+  FROM INSERTED 
+END;
+
+USE [PROYECTODBST]
+GO
+/****** Object:  Trigger [dbo].[AgregarPaciente]    Script Date: 16/01/2024 07:30:57 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER TRIGGER [dbo].[AgregarPaciente]
+ON [dbo].[Paciente]
+AFTER INSERT
+AS
+BEGIN
+  SET NOCOUNT ON;
+  DECLARE @Usuario VARCHAR(50);
+  SELECT @Usuario = SUSER_SNAME();
+  INSERT INTO Bitacora (Fecha, Hora, ID_Usuario, Accion, TablaAfectada, Descripcion)
+  SELECT CAST(GETDATE() AS date), CAST(GETDATE() AS time), @Usuario, 'Agregar', 'Paciente', 'Se agrego el Paciente con ID: ' + ID_Paciente
+  FROM INSERTED 
+END;
+
+USE [PROYECTODBST]
+GO
+/****** Object:  Trigger [dbo].[BorrarPaciente]    Script Date: 16/01/2024 07:31:07 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER TRIGGER [dbo].[BorrarPaciente]
+ON [dbo].[Paciente]
+FOR DELETE 
+AS
+BEGIN
+  SET NOCOUNT ON;
+  DECLARE @Usuario VARCHAR(50);
+  SELECT @Usuario = SUSER_SNAME();
+  INSERT INTO Bitacora (Fecha, Hora, ID_Usuario, Accion, TablaAfectada, Descripcion)
+  SELECT CAST(GETDATE() AS date), CAST(GETDATE() AS time), @Usuario, 'Borrar', 'Paciente', 'Se borro el Paciente con ID: ' + ID_Paciente
+  FROM DELETED 
+END;
+
+USE [PROYECTODBST]
+GO
+/****** Object:  Trigger [dbo].[ActualizarRecepcion]    Script Date: 16/01/2024 07:31:25 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER TRIGGER [dbo].[ActualizarRecepcion]
+ON [dbo].[Recepcion]
+AFTER UPDATE
+AS
+BEGIN
+  SET NOCOUNT ON;
+  DECLARE @Usuario VARCHAR(50);
+  SELECT @Usuario = SUSER_SNAME();
+  INSERT INTO Bitacora (Fecha, Hora, ID_Usuario, Accion, TablaAfectada, Descripcion)
+  SELECT CAST(GETDATE() AS date), CAST(GETDATE() AS time), @Usuario, 'Actualizar', 'Recepcion', 'Se actualizo el Recepcionista con ID: ' + ID_Recepcion
+  FROM INSERTED 
+END;
+
+
+USE [PROYECTODBST]
+GO
+/****** Object:  Trigger [dbo].[AgregarRecepcion]    Script Date: 16/01/2024 07:31:37 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER TRIGGER [dbo].[AgregarRecepcion]
+ON [dbo].[Recepcion]
+AFTER INSERT
+AS
+BEGIN
+  SET NOCOUNT ON;
+  DECLARE @Usuario VARCHAR(50);
+  SELECT @Usuario = SUSER_SNAME();
+  INSERT INTO Bitacora (Fecha, Hora, ID_Usuario, Accion, TablaAfectada, Descripcion)
+  SELECT CAST(GETDATE() AS date), CAST(GETDATE() AS time), @Usuario, 'Agregar', 'Recepcion', 'Se agrego el Recepcionista con ID: ' + ID_Recepcion
+  FROM INSERTED 
+END;
+
+
+
+USE [PROYECTODBST]
+GO
+/****** Object:  Trigger [dbo].[BorrarRecepción]    Script Date: 16/01/2024 07:31:46 p. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER TRIGGER [dbo].[BorrarRecepción]
+ON [dbo].[Recepcion]
+AFTER DELETE
+AS
+BEGIN
+  SET NOCOUNT ON;
+  DECLARE @Usuario VARCHAR(50);
+  SELECT @Usuario = SUSER_SNAME();
+  INSERT INTO Bitacora (Fecha, Hora, ID_Usuario, Accion, TablaAfectada, Descripcion)
+  SELECT CAST(GETDATE() AS date), CAST(GETDATE() AS time), @Usuario, 'Borrar', 'Recepcion', 'Se borro el Recepcionista con ID: ' + ID_Recepcion
+  FROM DELETED 
+END;
